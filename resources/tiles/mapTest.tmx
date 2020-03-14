@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.2" tiledversion="1.3.3" orientation="orthogonal" renderorder="right-down" width="100" height="12" tilewidth="16" tileheight="16" infinite="0" nextlayerid="3" nextobjectid="1">
+ <tileset firstgid="1" name="TileSet-1" tilewidth="16" tileheight="16" tilecount="16" columns="4">
+  <image source="TileSet-1.png" width="64" height="64"/>
+ </tileset>
+ <layer id="1" name="Ground" width="100" height="12">
+  <data encoding="base64" compression="zlib">
+   eJztk9EKgDAIRefK6v+/OAWhy2LEYOwh74ELEwSZB0shhBBCCCF/pXaSndU76Hmgj7V8ecjow/8rFrVslj1qiVqa+pw4lz7e4M7dRYU3Ojmg7xqcMbL77D78LvzPuO/2LvBmNHprvLFfy+N0VrJxA6NFARA=
+  </data>
+ </layer>
+ <layer id="2" name="Grass" width="100" height="12">
+  <data encoding="base64" compression="zlib">
+   eJzt07EJACAMBEAX0Oy/rTZC0M5GwTt4AkmT5ksBAADgRzFSR1qakfZz5htvqbcfYJM7tPaKcx3+oQEo
+  </data>
+ </layer>
+</map>
