@@ -43,6 +43,14 @@ public class play extends gameState{
 
     //for random map generation
     private map mapControl;
+    private int lenPower2;
+    private float camRightPoint, camLeftPoint;
+    private int len;
+    private int cOffset = 0;
+    private int rOffset, lOffset;
+    private float leftPoint, rightPoint;
+
+    private static Array<Body> bodiesToRemove;
 
     //Character physics stuff
     private contactListener cl;
@@ -60,6 +68,12 @@ public class play extends gameState{
     public play(stateHandler GSH) {
         super(GSH);
 
+        bodiesToRemove = new Array<Body>();
+
+        len = (int)(mainGame.cWIDTH / mainGame.TILESIZE);
+
+        lenPower2 = (int)Math.pow(2, Math.ceil(Math.log(len) / (Math.log(2))));
+
         //setup physics stuff
         boxWorld = new World(new Vector2(0, -9.81f), true);
         cl = new contactListener();
@@ -75,8 +89,8 @@ public class play extends gameState{
         createChar();
 
         //map generation init
-        mapControl = new map();
-        mapControl.addChunk(0);
+        mapControl = new map(20);
+        mapControl.addChunk(cOffset);
     }
 
     public  void handleInput() {
@@ -120,13 +134,12 @@ public class play extends gameState{
         boxWorld.step(delta, 6, 2);
 
         //remove obejcts after world has finished updating
-        Array<Body> bodies = cl.getBodiesToRemove();
-        for (int i = 0; i < bodies.size; i++) {
-            Body b = bodies.get(i);
+        for (int i = 0; i < bodiesToRemove.size; i++) {
+            Body b = bodiesToRemove.get(i);
             //remove from array
             boxWorld.destroyBody(b);
         }
-        bodies.clear();
+        bodiesToRemove.clear();
 
         myChar.update(delta);
     }
@@ -155,6 +168,31 @@ public class play extends gameState{
 
         mainCam.update();
 
+        camRightPoint = mainCam.position.x + mainCam.viewportWidth / 2;
+        camLeftPoint = mainCam.position.x - mainCam.viewportWidth / 2;
+
+        rightPoint = lenPower2 * mainGame.TILESIZE * (cOffset + 1);
+        leftPoint = mainGame.TILESIZE + lenPower2 * mainGame.TILESIZE * cOffset;
+
+        if (myChar.getPosition().x * PPM > rightPoint + mainCam.viewportWidth / 2) {
+           mapControl.removeChunk(cOffset - 1);
+           cOffset++;
+        }
+        if (myChar.getPosition().x * PPM < leftPoint - mainCam.viewportWidth / 2) {
+            mapControl.removeChunk(cOffset + 1);
+            cOffset--;
+        }
+
+        if (camRightPoint > rightPoint && !mapControl.hasChunk(cOffset + 1)) {
+            mapControl.addChunk(cOffset + 1);
+        }
+
+        if (camLeftPoint < leftPoint && !mapControl.hasChunk(cOffset - 1)) {
+            mapControl.addChunk(cOffset - 1);
+        }
+
+        //System.out.println();
+
         //for drawing loaded maps
         //tmr.setView(mainCam);
         //tmr.render();
@@ -169,6 +207,10 @@ public class play extends gameState{
             bdRen.render(boxWorld, boxCam.combined);
 
         }
+    }
+
+    public static void addBodToDestroy(Body b) {
+        bodiesToRemove.add(b);
     }
 
     //create main character

@@ -92,4 +92,8 @@ public class chunk {
     public int getOFFSET() {
         return OFFSET;
     }
+
+    public int[] getHeightMap() {
+        return heightMap;
+    }
 }

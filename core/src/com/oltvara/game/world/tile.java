@@ -17,6 +17,7 @@ public class tile {
     private TextureRegion tx;
     private String[] grassNames, groundNames, liveGroundNames;
     BodyDef defBod;
+    Body bod;
     private FixtureDef defFix;
     private Vector2 pos;
     private final int OFFSET;
@@ -35,13 +36,13 @@ public class tile {
         size = mainGame.TILESIZE;
 
         defBod = new BodyDef();
+
         defBod.type = BodyDef.BodyType.StaticBody;
         defBod.position.set((pos.x + 0.5f + OFFSET) * size / PPM, (pos.y + 0.5f) * size / PPM);
         defFix  = new FixtureDef();
 
-
-
-        createFix();
+        bod = play.boxWorld.createBody(defBod);
+        bod.createFixture(createFix());
     }
 
     public void render(SpriteBatch sb) {
@@ -74,12 +75,10 @@ public class tile {
         defFix.filter.maskBits = -1;
         defFix.isSensor = false;
 
-        play.boxWorld.createBody(defBod).createFixture(defFix);
-
         return defFix;
     }
 
-    public BodyDef getBod() { return defBod; }
+    public Body getBod() { return bod; }
     public FixtureDef getFix() { return defFix; }
     public Vector2 getPosition() { return pos; }
 
