@@ -3,10 +3,11 @@ package com.oltvara.game.world;
 import static com.oltvara.game.mainGame.fct;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.math.Vector2;
 import com.oltvara.game.gamestates.play;
 import com.oltvara.game.world.wrldHandlers.chunk;
-
 import java.util.HashMap;
+
 
 public class map {
 
@@ -20,18 +21,12 @@ public class map {
         this.MAXCHANGE = maxChange;
 
         chunks = new HashMap<Integer, chunk>();
-        leftHeight = 5;
-        rightHeight = 5;
     }
 
     public void render(SpriteBatch sb) {
         for(chunk ch : chunks.values()){
             ch.render(sb);
         }
-    }
-
-    public void updateTiles(int offset) {
-        chunks.get(offset).updateTiles();
     }
 
     public void addChunk(int offset) {
@@ -46,7 +41,7 @@ public class map {
             rightHeight = (int)fct.random(0, MAXCHANGE);
         }
 
-        ch = new chunk(leftHeight, rightHeight, MAXCHANGE / 5, 0.001f, offset);
+        ch = new chunk(leftHeight, rightHeight, MAXCHANGE / 5, 0.00001f, offset);
         chunks.put(offset, ch);
     }
 
@@ -57,7 +52,6 @@ public class map {
             play.addBodToDestroy(tl.getBod());
         }
         chunks.remove(offset);
-
     }
 
     public boolean hasChunk(int offset) {

@@ -39,44 +39,58 @@ ground-1-2
   orig: 16, 16
   offset: 0, 0
   index: -1
-groundLive-1-1
+groundDLive-1-1
   rotate: false
   xy: 92, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-groundLiveSpeckle-1-1
+groundDLiveSpeckle-1-1
   rotate: false
   xy: 110, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-groundRock-1-1
+groundLive-1-1
   rotate: false
   xy: 128, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-groundRockSpeckle-1-1
+groundLiveSpeckle-1-1
   rotate: false
   xy: 146, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-groundSpeckle-1-1
+groundRock-1-1
   rotate: false
   xy: 164, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-groundSpeckle-1-2
+groundRockSpeckle-1-1
   rotate: false
   xy: 182, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+groundSpeckle-1-1
+  rotate: false
+  xy: 200, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+groundSpeckle-1-2
+  rotate: false
+  xy: 218, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0

@@ -12,10 +12,20 @@ import com.oltvara.game.handlers.*;
 public class mainGame extends ApplicationAdapter {
 
 	public static final String TITLE = "Olt' Vara";
-	public static final int cWIDTH = 480;
-	public static final int cHEIGHT = 360;
-	public static final int SCALE = 2;
-	public static final float TILESIZE = 16;
+
+	private static final float dWIDTH = 1920;
+	private static final float dHEIGHT = 1080;
+	private static final float RATIO = dWIDTH / dHEIGHT;
+
+	public static final int TILESIZE = 16;
+	public static final int numTILES = 33;
+	public static final int numPowerTILES = 32;
+	public static final int tileBUFFER = 4;
+
+	public static final int cWIDTH = (int)(TILESIZE * numTILES - (TILESIZE * tileBUFFER));
+	public static final int cHEIGHT = (int)(cWIDTH / RATIO);
+
+	public static final int SCALE = (int)(dWIDTH / cWIDTH);
 
 	private static final float TICK = 1 / 60f;
 	private float elapsedTime;
@@ -36,6 +46,10 @@ public class mainGame extends ApplicationAdapter {
 	public static maths fct;
 
 	public static TextureAtlas groundAtlas;
+
+	public mainGame() {
+		System.out.println(cWIDTH);
+	}
 
 	@Override
 	public void create() {

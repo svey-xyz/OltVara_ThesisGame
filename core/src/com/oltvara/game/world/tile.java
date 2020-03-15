@@ -10,29 +10,34 @@ import com.oltvara.game.world.wrldHandlers.physicsVars;
 import com.oltvara.game.mainGame;
 
 import static com.oltvara.game.world.wrldHandlers.physicsVars.PPM;
+import static com.oltvara.game.mainGame.fct;
 
 public class tile {
 
     private final float size;
-    private TextureRegion tx;
-    private String[] grassNames, groundNames, liveGroundNames;
+    public TextureRegion tx;
+    public String[] grassNames, groundNames, liveGroundNames, rockNames, liveDGroundNames;
     BodyDef defBod;
     Body bod;
     private FixtureDef defFix;
-    private Vector2 pos;
+    private final Vector2 POS;
     private final int OFFSET;
+    private double rand;
+    private int txPick;
+    private int xFLIP, yFLIP;
+    private final String EDGE;
 
-    public tile(Vector2 pos, chunk ch) {
-        this.pos = pos;
-        this.OFFSET = ch.getOFFSET();
+    public tile(Vector2 pos, int offset, String edge) {
+        this.POS = pos;
+        this.OFFSET = offset;
+        this.EDGE = edge;
 
         grassNames = new String[]{"grass-1-1", "grass-1-2", "grass-1-3"};
-        groundNames = new String[]{"ground-1-1", "ground-1-2", "groundRock-1-1", "groundRockSpeckle-1-1", "groundSpeckle-1-1", "groundSpeckle-1-2"};
+        groundNames = new String[]{"ground-1-1", "ground-1-2", "groundSpeckle-1-1", "groundSpeckle-1-2"};
+        rockNames = new String[]{"groundRock-1-1", "groundRockSpeckle-1-1"};
         liveGroundNames = new String[]{"groundLive-1-1", "groundLiveSpeckle-1-1"};
+        liveDGroundNames = new String[]{"groundDLive-1-1", "groundDLiveSpeckle-1-1"};
 
-        int txPick = (int)mainGame.fct.random(0, groundNames.length - 1);
-
-        tx = mainGame.groundAtlas.findRegion(groundNames[txPick]);
         size = mainGame.TILESIZE;
 
         defBod = new BodyDef();
@@ -45,7 +50,25 @@ public class tile {
         bod.createFixture(createFix());
     }
 
+    public void updateTexture(String[] txChoice, int flip) {
+        this.xFLIP = flip;
+        rand = fct.random();
+        if (txChoice.equals(groundNames)) {
+            if (rand < 0.1) {
+                txPick = (int) mainGame.fct.random(0, txChoice.length - 1);
+                tx = mainGame.groundAtlas.findRegion(txChoice[txPick]);
+            } else {
+                txPick = (int) mainGame.fct.random(0, txChoice.length - 1);
+                tx = mainGame.groundAtlas.findRegion(txChoice[txPick]);
+            }
+        } else {
+            txPick = (int) mainGame.fct.random(0, txChoice.length - 1);
+            tx = mainGame.groundAtlas.findRegion(txChoice[txPick]);
+        }
+    }
+
     public void render(SpriteBatch sb) {
+        if (tx == null) { return; }
         sb.begin();
         sb.draw(
                 tx,
@@ -78,8 +101,11 @@ public class tile {
         return defFix;
     }
 
+    public boolean isEDGE() { return isRIGHT() || isLEFT(); }
+    public boolean isRIGHT() { return EDGE.equals("RIGHT"); }
+    public boolean isLEFT() { return EDGE.equals("LEFT"); }
     public Body getBod() { return bod; }
     public FixtureDef getFix() { return defFix; }
-    public Vector2 getPosition() { return pos; }
+    public Vector2 getPosition() { return POS; }
 
 }

@@ -1,7 +1,7 @@
 package com.oltvara.game.gamestates;
 
+import static com.oltvara.game.mainGame.*;
 import static com.oltvara.game.world.wrldHandlers.physicsVars.PPM;
-import static com.oltvara.game.mainGame.fct;
 
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -21,8 +21,7 @@ import com.oltvara.game.handlers.inputControl;
 import com.oltvara.game.world.wrldHandlers.physicsVars;
 import com.oltvara.game.handlers.stateHandler;
 import com.oltvara.game.mainGame;
-import com.oltvara.game.world.tile;
-import com.oltvara.game.world.wrldHandlers.chunk;
+
 
 public class play extends gameState{
 
@@ -31,24 +30,24 @@ public class play extends gameState{
     public static World boxWorld;
     private Box2DDebugRenderer bdRen;
     private Vector3 targetPos;
-    private final float CAMSPEEDMODIFER = 2f;
+    private final float CAMSPEEDMODIFER = 500f;
     private float yDiff, dist;
 
     private OrthographicCamera boxCam;
 
     //for loaded Tile maps
     private TiledMap tileMap;
-    private float tileSize;
     private OrthogonalTiledMapRenderer tmr;
 
+    public static map getMapControl() {
+        return mapControl;
+    }
+
     //for random map generation
-    private map mapControl;
-    private int lenPower2;
+    private static map mapControl;
     private float camRightPoint, camLeftPoint;
-    private int len;
     private int cOffset = 0;
-    private int rOffset, lOffset;
-    private float leftPoint, rightPoint;
+    private int leftPoint, rightPoint, leftPointTotal, rightPointTotal;
 
     private static Array<Body> bodiesToRemove;
 
@@ -70,10 +69,6 @@ public class play extends gameState{
 
         bodiesToRemove = new Array<Body>();
 
-        len = (int)(mainGame.cWIDTH / mainGame.TILESIZE);
-
-        lenPower2 = (int)Math.pow(2, Math.ceil(Math.log(len) / (Math.log(2))));
-
         //setup physics stuff
         boxWorld = new World(new Vector2(0, -9.81f), true);
         cl = new contactListener();
@@ -87,13 +82,16 @@ public class play extends gameState{
         //static - unaffected; dynamic - affected; kinematic - unaffected but can still move
         //create player
         createChar();
+        charBod = myChar.getBod();
+        pos = charBod.getPosition();
+        mainCam.position.set(new Vector3(pos.x * PPM, pos.y * PPM, mainCam.position.z));
 
         //map generation init
-        mapControl = new map(20);
+        mapControl = new map(30);
         mapControl.addChunk(cOffset);
     }
 
-    public  void handleInput() {
+    public void handleInput() {
         charBod = myChar.getBod();
         pos = charBod.getPosition();
         vel = charBod.getLinearVelocity();
@@ -127,7 +125,7 @@ public class play extends gameState{
         }
     }
 
-    public  void update(float delta) {
+    public void update(float delta) {
 
         handleInput();
 
@@ -142,54 +140,14 @@ public class play extends gameState{
         bodiesToRemove.clear();
 
         myChar.update(delta);
+        createChunks();
     }
 
-    public  void render() {
+    public void render() {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        yDiff = Math.abs(mainCam.position.y - pos.y * PPM);
-
-        if (yDiff > mainGame.cHEIGHT / 8f) {
-            targetPos = new Vector3(pos.x * PPM, pos.y * PPM, mainCam.position.z);
-        } else {
-            targetPos = new Vector3(pos.x * PPM, mainCam.position.y, mainCam.position.z);
-        }
-
-        dist = fct.distance(mainCam.position.x, mainCam.position.y, targetPos.x, targetPos.y);
-
-        targetPos.y = (float)fct.constrain(targetPos.y, mainGame.cHEIGHT / 2f, 1000000000f);
-
-        if (dist < 1) {
-            mainCam.position.set(targetPos);
-        } else {
-            mainCam.position.lerp(targetPos, (CAMSPEEDMODIFER / dist));
-        }
-
-        mainCam.update();
-
-        camRightPoint = mainCam.position.x + mainCam.viewportWidth / 2;
-        camLeftPoint = mainCam.position.x - mainCam.viewportWidth / 2;
-
-        rightPoint = lenPower2 * mainGame.TILESIZE * (cOffset + 1);
-        leftPoint = mainGame.TILESIZE + lenPower2 * mainGame.TILESIZE * cOffset;
-
-        if (myChar.getPosition().x * PPM > rightPoint + mainCam.viewportWidth / 2) {
-           mapControl.removeChunk(cOffset - 1);
-           cOffset++;
-        }
-        if (myChar.getPosition().x * PPM < leftPoint - mainCam.viewportWidth / 2) {
-            mapControl.removeChunk(cOffset + 1);
-            cOffset--;
-        }
-
-        if (camRightPoint > rightPoint && !mapControl.hasChunk(cOffset + 1)) {
-            mapControl.addChunk(cOffset + 1);
-        }
-
-        if (camLeftPoint < leftPoint && !mapControl.hasChunk(cOffset - 1)) {
-            mapControl.addChunk(cOffset - 1);
-        }
+        cameraMovement();
 
         //System.out.println();
 
@@ -209,8 +167,62 @@ public class play extends gameState{
         }
     }
 
+    private void cameraMovement() {
+        yDiff = Math.abs(mainCam.position.y - pos.y * PPM);
+
+        if (yDiff > mainGame.cHEIGHT / 4f) {
+            targetPos = new Vector3(pos.x * PPM, pos.y * PPM, mainCam.position.z);
+        } else {
+            targetPos = new Vector3(pos.x * PPM, mainCam.position.y, mainCam.position.z);
+        }
+
+        dist = fct.distance(mainCam.position.x, mainCam.position.y, targetPos.x, targetPos.y);
+
+        targetPos.y = (float)fct.constrain(targetPos.y, mainGame.cHEIGHT / 2f, 1000000000f);
+
+
+        mainCam.position.lerp(targetPos, (dist / CAMSPEEDMODIFER));
+        //mainCam.position.set(pos.x * PPM, pos.y * PPM, mainCam.position.z);
+
+
+        mainCam.update();
+    }
+
     public static void addBodToDestroy(Body b) {
         bodiesToRemove.add(b);
+    }
+
+    private void createChunks() {
+        camRightPoint = (mainCam.position.x + mainCam.viewportWidth / 2);
+        camLeftPoint = mainCam.position.x - mainCam.viewportWidth / 2;
+
+
+        rightPoint = (numTILES - tileBUFFER) * TILESIZE * (cOffset + 1);
+        leftPoint = tileBUFFER * TILESIZE + numTILES * TILESIZE * cOffset;
+
+        rightPointTotal = numTILES * TILESIZE * (cOffset + 1);
+        leftPointTotal = numTILES * TILESIZE * cOffset;
+
+        /*rightPoint = lenPower2 * mainGame.TILESIZE + (cOffset + 1);
+        leftPoint = mainGame.TILESIZE + lenPower2 * mainGame.TILESIZE * cOffset;*/
+
+        if (mainCam.position.x > rightPointTotal + mainCam.viewportWidth / 2) {
+            mapControl.removeChunk(cOffset - 1);
+            cOffset++;
+
+        }
+        if (mainCam.position.x < leftPointTotal - mainCam.viewportWidth / 2) {
+            mapControl.removeChunk(cOffset + 1);
+            cOffset--;
+        }
+
+        if (camRightPoint > rightPoint && !mapControl.hasChunk(cOffset + 1)) {
+            mapControl.addChunk(cOffset + 1);
+        }
+
+        if (camLeftPoint < leftPoint && !mapControl.hasChunk(cOffset - 1)) {
+            mapControl.addChunk(cOffset - 1);
+        }
     }
 
     //create main character
@@ -220,7 +232,7 @@ public class play extends gameState{
         FixtureDef defFix = new FixtureDef();
 
         //create main Character
-        defBod.position.set(160 / PPM, 200 / PPM);
+        defBod.position.set(160 / PPM, 800 / PPM);
         defBod.type = BodyDef.BodyType.DynamicBody;
         Body body= boxWorld.createBody(defBod);
 
@@ -253,8 +265,6 @@ public class play extends gameState{
 
         TiledMapTileLayer layer = (TiledMapTileLayer) tileMap.getLayers().get("Ground");
 
-        tileSize = layer.getTileWidth();
-
         for (int row=0; row < layer.getHeight(); row++) {
             for (int col = 0; col < layer.getWidth(); col++) {
                 TiledMapTileLayer.Cell cell = layer.getCell(col, row);
@@ -264,15 +274,15 @@ public class play extends gameState{
 
                 //create physics box
                 defBod.type = BodyDef.BodyType.StaticBody;
-                defBod.position.set((col + 0.5f) * tileSize / PPM, (row + 0.5f) * tileSize / PPM);
+                defBod.position.set((col + 0.5f) * TILESIZE / PPM, (row + 0.5f) * TILESIZE / PPM);
 
                 ChainShape cs = new ChainShape();
                 Vector2[] v = new Vector2[4];
 
-                v[0] = new Vector2(-tileSize / 2 / PPM, -tileSize / 2 /PPM);
-                v[1] = new Vector2(-tileSize / 2 / PPM, tileSize / 2 /PPM);
-                v[2] = new Vector2(tileSize / 2 / PPM, tileSize / 2 /PPM);
-                v[3] = new Vector2(tileSize / 2 / PPM, -tileSize / 2 /PPM);
+                v[0] = new Vector2(-TILESIZE / 2f / PPM, -TILESIZE / 2f /PPM);
+                v[1] = new Vector2(-TILESIZE / 2f / PPM, TILESIZE / 2f /PPM);
+                v[2] = new Vector2(TILESIZE / 2f / PPM, TILESIZE / 2f /PPM);
+                v[3] = new Vector2(TILESIZE / 2f / PPM, -TILESIZE / 2f /PPM);
 
                 cs.createChain(v);
                 defFix.shape = cs;
