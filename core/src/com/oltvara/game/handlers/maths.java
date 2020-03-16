@@ -5,6 +5,7 @@ import java.math.RoundingMode;
 import java.util.concurrent.ThreadLocalRandom;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 
 /*My math functions class. Some of these I recreated based on processing expressions.
 Color functions to work around LibGDX color library.
@@ -54,6 +55,18 @@ public class maths {
 
     public double constrain(double value, double min, double max) {
         return Math.min(Math.max(value, min), max);
+    }
+
+    public double constrain(double value, double min) {
+        return Math.min(value, min);
+    }
+
+    public Vector3 roundVec(Vector3 vec) {
+        return new Vector3((int)vec.x, (int)vec.y, (int)vec.z);
+    }
+
+    public Vector2 roundVec(Vector2 vec) {
+        return new Vector2((int)vec.x, (int)vec.y);
     }
 
     public float distance(Vector2 object1, Vector2 object2){

@@ -30,7 +30,8 @@ public class play extends gameState{
     public static World boxWorld;
     private Box2DDebugRenderer bdRen;
     private Vector3 targetPos;
-    private final float CAMSPEEDMODIFER = 500f;
+    private final float CAMSPEEDMODIFER = 300f;
+    private float camLastY;
     private float yDiff, dist;
 
     private OrthographicCamera boxCam;
@@ -46,7 +47,7 @@ public class play extends gameState{
     //for random map generation
     private static map mapControl;
     private float camRightPoint, camLeftPoint;
-    private int cOffset = 0;
+    private int cOffset = 0, lOffset =0;
     private int leftPoint, rightPoint, leftPointTotal, rightPointTotal;
 
     private static Array<Body> bodiesToRemove;
@@ -61,6 +62,8 @@ public class play extends gameState{
     private float jump;
     private Vector2 pos, vel;
     private int holdTime;
+
+    private boolean movingY;
 
 
 
@@ -170,21 +173,34 @@ public class play extends gameState{
     private void cameraMovement() {
         yDiff = Math.abs(mainCam.position.y - pos.y * PPM);
 
-        if (yDiff > mainGame.cHEIGHT / 4f) {
+        //controlled Y movement
+        if (yDiff > cHEIGHT / 4f) { movingY = true; }
+        if (yDiff < TILESIZE / 4f) { movingY = false; }
+
+        //Set target pose based on yDiff
+        if (movingY) {
             targetPos = new Vector3(pos.x * PPM, pos.y * PPM, mainCam.position.z);
-        } else {
+        }
+        if (!movingY) {
             targetPos = new Vector3(pos.x * PPM, mainCam.position.y, mainCam.position.z);
         }
 
+        //distance between camera and character position determines lerp speed
         dist = fct.distance(mainCam.position.x, mainCam.position.y, targetPos.x, targetPos.y);
 
-        targetPos.y = (float)fct.constrain(targetPos.y, mainGame.cHEIGHT / 2f, 1000000000f);
+        //don't go below bottom block
+        targetPos.y = (float)fct.constrain(targetPos.y, cHEIGHT / 2f, 1000000000f);
 
+        //lerping
+        final float speed=(dist/CAMSPEEDMODIFER), ySpeed = speed/ 10, ispeed=1.0f-speed, yIsSpeed=1.0f-ySpeed;
+        Vector3 cameraPosition = mainCam.position;
+        cameraPosition.scl(ispeed, yIsSpeed, 1);
+        targetPos.scl(speed, ySpeed, 1);
+        cameraPosition.add(targetPos);
 
-        mainCam.position.lerp(targetPos, (dist / CAMSPEEDMODIFER));
-        //mainCam.position.set(pos.x * PPM, pos.y * PPM, mainCam.position.z);
+        //cameraPosition.set(fct.roundVec(cameraPosition));
 
-
+        mainCam.position.set(cameraPosition);
         mainCam.update();
     }
 
@@ -193,9 +209,13 @@ public class play extends gameState{
     }
 
     private void createChunks() {
+        if (lOffset != cOffset) {
+            System.out.println(cOffset);
+            lOffset = cOffset;
+        }
+
         camRightPoint = (mainCam.position.x + mainCam.viewportWidth / 2);
         camLeftPoint = mainCam.position.x - mainCam.viewportWidth / 2;
-
 
         rightPoint = (numTILES - tileBUFFER) * TILESIZE * (cOffset + 1);
         leftPoint = tileBUFFER * TILESIZE + numTILES * TILESIZE * cOffset;
@@ -216,11 +236,11 @@ public class play extends gameState{
             cOffset--;
         }
 
-        if (camRightPoint > rightPoint && !mapControl.hasChunk(cOffset + 1)) {
+        if (camRightPoint > rightPointTotal - (TILESIZE * tileBUFFER / 2f) && !mapControl.hasChunk(cOffset + 1)) {
             mapControl.addChunk(cOffset + 1);
         }
 
-        if (camLeftPoint < leftPoint && !mapControl.hasChunk(cOffset - 1)) {
+        if (camLeftPoint < leftPointTotal + (TILESIZE * tileBUFFER / 2f) && !mapControl.hasChunk(cOffset - 1)) {
             mapControl.addChunk(cOffset - 1);
         }
     }
@@ -232,7 +252,7 @@ public class play extends gameState{
         FixtureDef defFix = new FixtureDef();
 
         //create main Character
-        defBod.position.set(160 / PPM, 800 / PPM);
+        defBod.position.set(0, 1000 / PPM);
         defBod.type = BodyDef.BodyType.DynamicBody;
         Body body= boxWorld.createBody(defBod);
 

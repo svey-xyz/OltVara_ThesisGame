@@ -4,6 +4,7 @@ import static com.oltvara.game.mainGame.fct;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.oltvara.game.gamestates.play;
 import com.oltvara.game.world.wrldHandlers.chunk;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ public class map {
     private HashMap<Integer, chunk> chunks;
     private chunk ch;
 
-    private int leftHeight, rightHeight;
+    private int leftHeight, rightHeight, leftChange, rightChange;
     private final int MAXCHANGE;
 
     public map(int maxChange) {
@@ -38,7 +39,11 @@ public class map {
         if (hasChunk(offset + 1)) {
             rightHeight = chunks.get(offset + 1).getHeightMap()[0];
         } else {
-            rightHeight = (int)fct.random(0, MAXCHANGE);
+            rightChange = (int)fct.random(0, MAXCHANGE);
+            rightHeight = (int)fct.random(0, MAXCHANGE + leftHeight / 2f);
+        }
+        if (!hasChunk(offset - 1)) {
+            leftHeight = (int)fct.random(0, MAXCHANGE + rightChange / 2f);
         }
 
         ch = new chunk(leftHeight, rightHeight, MAXCHANGE / 5, 0.00001f, offset);
@@ -48,8 +53,8 @@ public class map {
     public void removeChunk(int offset) {
         if (chunks.get(offset) == null) { return; }
 
-        for (tile tl : chunks.get(offset).getTileMap().values()) {
-            play.addBodToDestroy(tl.getBod());
+        for (Body b : chunks.get(offset).getBodies()) {
+            play.addBodToDestroy(b);
         }
         chunks.remove(offset);
     }

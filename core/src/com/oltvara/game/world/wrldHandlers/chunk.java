@@ -2,6 +2,7 @@ package com.oltvara.game.world.wrldHandlers;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
 import com.oltvara.game.gamestates.play;
 import com.oltvara.game.mainGame;
 import com.oltvara.game.world.map;
@@ -9,15 +10,16 @@ import com.oltvara.game.world.tile;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.oltvara.game.mainGame.numPowerTILES;
+import static com.oltvara.game.mainGame.numTILES;
 
 public class chunk {
 
     private ConcurrentHashMap<Vector2, tile> tiles;
     private int[] heightMap;
-    private final int LEN;
     private final int LEFTPT, RIGHTPT, OFFSET;
     private float displace, roughness;
     private Vector2 pos;
@@ -25,7 +27,8 @@ public class chunk {
     private map map;
 
     private HashMap<String, Vector2> neighbours;
-    private chunk nCH;
+
+    private ArrayList<Body> bodies;
 
     public chunk(int leftHeight, int rightHeight, int displace, float roughness, int offset) {
         this.displace = displace;
@@ -34,16 +37,16 @@ public class chunk {
         this.LEFTPT = leftHeight;
         this.RIGHTPT = rightHeight;
 
-        this.LEN = (int)(mainGame.cHEIGHT / mainGame.TILESIZE);
         neighbours = new HashMap<String, Vector2>();
 
-        this.OFFSET = offset * (numPowerTILES + 1);
+        this.OFFSET = offset * (numTILES);
 
         map = play.getMapControl();
 
-        heightMap = new int[numPowerTILES + 1];
+        heightMap = new int[numTILES];
 
         tiles = new ConcurrentHashMap<Vector2, tile>();
+        bodies = new ArrayList<Body>();
 
         sideTiles();
         midPoint();
@@ -54,12 +57,34 @@ public class chunk {
     private void updateTiles() {
         for (tile tl : tiles.values()) {
             getNeighbours(tl);
+            int yFlip = new Random().nextBoolean() ? -1 : 1;
             if (!tiles.containsKey(neighbours.get("LEFT")) && !tiles.containsKey(neighbours.get("RIGHT")) && !tl.isEDGE()) {
-                tl.updateTexture(tl.liveDGroundNames, 1);
+                tl.updateTexture(tl.liveDGroundNames, 1, yFlip);
             } else if (!tiles.containsKey(neighbours.get("RIGHT")) && !tl.isRIGHT()) {
-                tl.updateTexture(tl.liveGroundNames, 1);
+                tl.updateTexture(tl.liveGroundNames, 1, yFlip);
+            } else if (!tiles.containsKey(neighbours.get("LEFT")) && !tl.isLEFT()) {
+                tl.updateTexture(tl.liveGroundNames, -1, yFlip);
             } else {
-                tl.updateTexture(tl.groundNames, 1);
+                String[] groundTex = new Random().nextFloat() > 0.06 ? tl.groundNames: tl.rockNames;
+                int xFlip = 1;
+                yFlip = 1;
+                if (groundTex.equals(tl.groundNames)) {
+                    xFlip = new Random().nextBoolean() ? -1 : 1;
+                    yFlip = new Random().nextBoolean() ? -1 : 1;
+                }
+                tl.updateTexture(groundTex, xFlip, yFlip);
+            }
+
+            if (!tiles.containsKey(neighbours.get("TOP"))) {
+                tl.addGrass();
+            }
+
+            //only create physics body if tile is reachable
+            //should help with performance
+            if (!hasNeighbour(tl)) {
+                Body bod = play.boxWorld.createBody(tl.createBodDef());
+                bod.createFixture(tl.createFix());
+                bodies.add(bod);
             }
         }
     }
@@ -69,6 +94,10 @@ public class chunk {
         neighbours.put("RIGHT", new Vector2(tl.getPosition().x + 1, tl.getPosition().y));
         neighbours.put("LEFT", new Vector2(tl.getPosition().x - 1, tl.getPosition().y));
         neighbours.put("TOP", new Vector2(tl.getPosition().x, tl.getPosition().y + 1));
+    }
+
+    private boolean hasNeighbour(tile tl) {
+        return (tiles.containsKey(neighbours.get("LEFT")) && tiles.containsKey(neighbours.get("RIGHT")) && tiles.containsKey(neighbours.get("TOP")));
     }
 
     public void render(SpriteBatch sb) {
@@ -120,6 +149,10 @@ public class chunk {
 
     public int getOFFSET() {
         return OFFSET;
+    }
+
+    public ArrayList<Body> getBodies() {
+        return bodies;
     }
 
     public int[] getHeightMap() {

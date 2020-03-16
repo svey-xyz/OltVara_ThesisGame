@@ -1,4 +1,5 @@
 package com.oltvara.game.entities;
+import static com.oltvara.game.mainGame.fct;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -33,8 +34,8 @@ public class sprite {
         sb.begin();
         sb.draw(
                 anim.getFrame(),
-                body.getPosition().x * physicsVars.PPM - width / 2,
-                body.getPosition().y * physicsVars.PPM - height / 2
+                (body.getPosition().x * physicsVars.PPM - width / 2),
+                (body.getPosition().y * physicsVars.PPM - height / 2)
         );
         sb.end();
     }
