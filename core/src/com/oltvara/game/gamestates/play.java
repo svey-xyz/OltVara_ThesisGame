@@ -3,6 +3,7 @@ package com.oltvara.game.gamestates;
 import static com.oltvara.game.mainGame.*;
 import static com.oltvara.game.world.wrldHandlers.physicsVars.PPM;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -11,6 +12,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.oltvara.game.entities.mainChar;
 import com.oltvara.game.world.map;
+import com.oltvara.game.world.tree;
 import com.oltvara.game.world.wrldHandlers.contactListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -25,7 +27,7 @@ import com.oltvara.game.mainGame;
 
 public class play extends gameState{
 
-    private final boolean DEBUG = false;
+    private final boolean DEBUG = true;
 
     public static World boxWorld;
     private Box2DDebugRenderer bdRen;
@@ -55,13 +57,17 @@ public class play extends gameState{
     //Character physics stuff
     private contactListener cl;
     private mainChar myChar;
+    private tree myTree;
+    private Body treeBod;
     private Body charBod;
     private final float MAXSPEED = 1.5f;
     private final float ACC = 0.1f;
-    private final int JUMP = 100;
+    private final int JUMP = 50;
+    private final int MAXJUMPVEL = 3;
     private float jump;
     private Vector2 pos, vel;
     private int holdTime;
+    private boolean jumping = false;
 
     private boolean movingY;
 
@@ -84,7 +90,9 @@ public class play extends gameState{
 
         //static - unaffected; dynamic - affected; kinematic - unaffected but can still move
         //create player
+        createTree();
         createChar();
+
         charBod = myChar.getBod();
         pos = charBod.getPosition();
         mainCam.position.set(new Vector3(pos.x * PPM, pos.y * PPM, mainCam.position.z));
@@ -99,12 +107,26 @@ public class play extends gameState{
         pos = charBod.getPosition();
         vel = charBod.getLinearVelocity();
 
-        if (inputControl.isReleased(inputControl.JUMPBUT) && cl.isCharContact()) {
-            holdTime = inputControl.heldTime(inputControl.JUMPBUT);
-            jump = JUMP * (holdTime / 2f);
-            jump = (int)fct.constrain(jump, JUMP, 200);
+        if (inputControl.isTap(inputControl.JUMPBUT) && cl.isCharContact()) {
+            jumping = true;
+        }
 
-            charBod.applyForceToCenter(0, jump, true);
+        if (inputControl.isPressed(inputControl.JUMPBUT) && jumping) {
+            if (charBod.getLinearVelocity().y < MAXJUMPVEL) {
+                holdTime = inputControl.heldTime(inputControl.JUMPBUT);
+                jump = JUMP * (holdTime / 4f);
+                jump = (int) fct.constrain(jump, JUMP, 200);
+
+                System.out.println(charBod.getLinearVelocity().y);
+
+                charBod.applyForceToCenter(0, jump, true);
+            } else {
+                jumping = false;
+            }
+        }
+
+        if (inputControl.isReleased(inputControl.JUMPBUT)) {
+            jumping = false;
         }
 
         if (inputControl.isPressed(inputControl.RIGHT) && vel.x < MAXSPEED) {
@@ -143,6 +165,7 @@ public class play extends gameState{
         bodiesToRemove.clear();
 
         myChar.update(delta);
+        myTree.update(delta);
         createChunks();
     }
 
@@ -160,7 +183,8 @@ public class play extends gameState{
 
         batch.setProjectionMatrix(mainCam.combined);
         mapControl.render(batch);
-        myChar.render(batch);
+        myChar.render(batch, Color.WHITE);
+        myTree.render(batch);
 
         if (DEBUG) {
             boxCam.position.set(mainCam.position).scl(1/PPM);
@@ -263,7 +287,7 @@ public class play extends gameState{
         body.createFixture(defFix).setUserData("mainChar");
 
         //create foot sensor
-        box.setAsBox(8 / PPM, 2 / PPM, new Vector2(0, -31 / PPM), 0);
+        box.setAsBox(7.5f / PPM, 2 / PPM, new Vector2(0, -31 / PPM), 0);
         defFix.shape = box;
         defFix.filter.categoryBits = physicsVars.bitCHAR;
         defFix.filter.maskBits = physicsVars.bitGROUND;
@@ -272,6 +296,10 @@ public class play extends gameState{
 
         body.setUserData(myChar);
         myChar = new mainChar(body);
+    }
+
+    private void createTree() {
+        myTree = new tree(new Vector2(0, 200 / PPM), "small_1-1-1", trTex.BUSHYTREE);
     }
 
     //for loading premade maps

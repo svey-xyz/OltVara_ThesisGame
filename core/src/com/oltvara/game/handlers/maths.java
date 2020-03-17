@@ -53,6 +53,20 @@ public class maths {
         return new Color (r, g, b, 1);
     }
 
+    public Color gaussianCol(Color col, float sDCol) {
+        float[] colValTemp = new float[] {col.r, col.g, col.b};
+
+        //adjust each rgb value by a gaussian curve
+        for (int j = 0; j < 3; j++) {
+            double rnd = randomGaussian(sDCol, 0);
+            colValTemp[j] += rnd;
+            colValTemp[j] = (float)constrain(colValTemp[j], 0, 255);
+        }
+
+        //creates LibGDX color
+        return new Color(colValTemp[0], colValTemp[1], colValTemp[2], 1);
+    }
+
     public double constrain(double value, double min, double max) {
         return Math.min(Math.max(value, min), max);
     }

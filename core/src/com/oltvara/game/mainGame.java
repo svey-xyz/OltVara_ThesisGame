@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.oltvara.game.handlers.*;
+import com.oltvara.game.world.wrldHandlers.treeTextureLoader;
 
 public class mainGame extends ApplicationAdapter {
 
@@ -47,6 +48,8 @@ public class mainGame extends ApplicationAdapter {
 
 	public static TextureAtlas groundAtlas;
 
+	public static treeTextureLoader trTex;
+
 	public mainGame() {
 		System.out.println(cWIDTH);
 	}
@@ -57,9 +60,11 @@ public class mainGame extends ApplicationAdapter {
 		Gdx.input.setInputProcessor(new inputHandler());
 
 		fct = new maths();
-
 		src = new srcHandler();
+		trTex = new treeTextureLoader();
+
 		src.importTX("resources/entities/charTest.png", "mainChar");
+		src.importTX("resources/environment/trees/1-1-1/layer1.png", "leaves-1-1-1");
 
 		groundAtlas = new TextureAtlas(Gdx.files.internal("resources/tiles/groundTiles.atlas"));
 

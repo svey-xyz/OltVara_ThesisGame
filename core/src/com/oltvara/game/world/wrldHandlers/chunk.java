@@ -81,7 +81,7 @@ public class chunk {
 
             //only create physics body if tile is reachable
             //should help with performance
-            if (!hasNeighbour(tl)) {
+            if (!hasNeighbours(tl)) {
                 Body bod = play.boxWorld.createBody(tl.createBodDef());
                 bod.createFixture(tl.createFix());
                 bodies.add(bod);
@@ -96,8 +96,10 @@ public class chunk {
         neighbours.put("TOP", new Vector2(tl.getPosition().x, tl.getPosition().y + 1));
     }
 
-    private boolean hasNeighbour(tile tl) {
-        return (tiles.containsKey(neighbours.get("LEFT")) && tiles.containsKey(neighbours.get("RIGHT")) && tiles.containsKey(neighbours.get("TOP")));
+    private boolean hasNeighbours(tile tl) {
+        if (tl.isRIGHT() && tiles.containsKey(neighbours.get("LEFT")) && tiles.containsKey(neighbours.get("TOP"))) return true;
+        if (tl.isLEFT() && tiles.containsKey(neighbours.get("RIGHT")) && tiles.containsKey(neighbours.get("TOP"))) return true;
+        return tiles.containsKey(neighbours.get("LEFT")) && tiles.containsKey(neighbours.get("RIGHT")) && tiles.containsKey(neighbours.get("TOP"));
     }
 
     public void render(SpriteBatch sb) {

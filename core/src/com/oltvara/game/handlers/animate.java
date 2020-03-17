@@ -46,7 +46,9 @@ public class animate {
         }
     }
 
-    public TextureRegion getFrame() { return frames[cFrame]; }
+    public TextureRegion getFrame() {
+        if (frames[cFrame] == null) System.out.println("it's not working");
+        return frames[cFrame]; }
 
     public int getLoopsNum() { return loops; }
 }

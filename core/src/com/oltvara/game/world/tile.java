@@ -1,5 +1,6 @@
 package com.oltvara.game.world;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -53,6 +54,7 @@ public class tile {
     public void render(SpriteBatch sb) {
         if (tx == null) { return; }
         sb.begin();
+        sb.setColor(Color.WHITE);
         sb.draw(
                 tx,
                 (relPOS.x) * physicsVars.PPM - TILESIZE / 2f,
