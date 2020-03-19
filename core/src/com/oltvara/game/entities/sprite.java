@@ -30,8 +30,8 @@ public class sprite {
         anim = new animate();
     }
 
-    protected void setAnim(TextureRegion[] texReg, float delay) {
-        anim.setFrames(texReg, delay);
+    protected void setAnim(TextureRegion[] texReg, float delay, int animOffset) {
+        anim.setFrames(texReg, delay, animOffset);
         width = texReg[0].getRegionWidth();
         height = texReg[0].getRegionHeight();
     }

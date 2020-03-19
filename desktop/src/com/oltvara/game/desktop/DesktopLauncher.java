@@ -15,6 +15,9 @@ public class DesktopLauncher {
 		config.width = cWIDTH * SCALE;
 		config.height = cHEIGHT * SCALE;
 
+		config.vSyncEnabled = true;
+
+
 		new LwjglApplication(new mainGame(), config);
 	}
 }

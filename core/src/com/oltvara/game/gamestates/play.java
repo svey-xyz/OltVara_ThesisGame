@@ -27,7 +27,7 @@ import com.oltvara.game.mainGame;
 
 public class play extends gameState{
 
-    private final boolean DEBUG = true;
+    private final boolean DEBUG = false;
 
     public static World boxWorld;
     private Box2DDebugRenderer bdRen;
@@ -57,8 +57,6 @@ public class play extends gameState{
     //Character physics stuff
     private contactListener cl;
     private mainChar myChar;
-    private tree myTree;
-    private Body treeBod;
     private Body charBod;
     private final float MAXSPEED = 1.5f;
     private final float ACC = 0.1f;
@@ -90,7 +88,6 @@ public class play extends gameState{
 
         //static - unaffected; dynamic - affected; kinematic - unaffected but can still move
         //create player
-        createTree();
         createChar();
 
         charBod = myChar.getBod();
@@ -116,8 +113,6 @@ public class play extends gameState{
                 holdTime = inputControl.heldTime(inputControl.JUMPBUT);
                 jump = JUMP * (holdTime / 4f);
                 jump = (int) fct.constrain(jump, JUMP, 200);
-
-                System.out.println(charBod.getLinearVelocity().y);
 
                 charBod.applyForceToCenter(0, jump, true);
             } else {
@@ -155,6 +150,7 @@ public class play extends gameState{
         handleInput();
 
         boxWorld.step(delta, 6, 2);
+        cameraMovement();
 
         //remove obejcts after world has finished updating
         for (int i = 0; i < bodiesToRemove.size; i++) {
@@ -164,16 +160,14 @@ public class play extends gameState{
         }
         bodiesToRemove.clear();
 
+        mapControl.update(delta);
         myChar.update(delta);
-        myTree.update(delta);
         createChunks();
     }
 
     public void render() {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-
-        cameraMovement();
 
         //System.out.println();
 
@@ -182,9 +176,10 @@ public class play extends gameState{
         //tmr.render();
 
         batch.setProjectionMatrix(mainCam.combined);
+
         mapControl.render(batch);
         myChar.render(batch, Color.WHITE);
-        myTree.render(batch);
+        mapControl.renderFront(batch);
 
         if (DEBUG) {
             boxCam.position.set(mainCam.position).scl(1/PPM);
@@ -203,7 +198,7 @@ public class play extends gameState{
 
         //Set target pose based on yDiff
         if (movingY) {
-            targetPos = new Vector3(pos.x * PPM, pos.y * PPM, mainCam.position.z);
+            targetPos = new Vector3(pos.x * PPM, pos.y * PPM + cHEIGHT / 6f, mainCam.position.z);
         }
         if (!movingY) {
             targetPos = new Vector3(pos.x * PPM, mainCam.position.y, mainCam.position.z);
@@ -284,6 +279,7 @@ public class play extends gameState{
         defFix.shape = box;
         defFix.filter.categoryBits = physicsVars.bitCHAR;
         defFix.filter.maskBits = physicsVars.bitGROUND;
+        //defFix.restitution = 0.8f;
         body.createFixture(defFix).setUserData("mainChar");
 
         //create foot sensor
@@ -296,10 +292,6 @@ public class play extends gameState{
 
         body.setUserData(myChar);
         myChar = new mainChar(body);
-    }
-
-    private void createTree() {
-        myTree = new tree(new Vector2(0, 200 / PPM), "small_1-1-1", trTex.BUSHYTREE);
     }
 
     //for loading premade maps
@@ -343,6 +335,8 @@ public class play extends gameState{
         }
     }
 
-    public  void dispose() {}
+    public  void dispose() {
+
+    }
 
 }

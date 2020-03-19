@@ -13,18 +13,18 @@ public class animate {
     public animate() {}
 
     public animate(TextureRegion[] frames) {
-        this(frames, 1 / 12f);
+        this(frames, 1 / 12f, 0);
     }
 
-    public animate(TextureRegion[] frames, float delay) {
-        setFrames(frames, delay);
+    public animate(TextureRegion[] frames, float delay, int animOffset) {
+        setFrames(frames, delay, animOffset);
     }
 
-    public void setFrames(TextureRegion[] frames, float delay) {
+    public void setFrames(TextureRegion[] frames, float delay, int animOffset) {
         this.frames = frames;
         this.delay = delay;
         t = 0;
-        cFrame = 0;
+        cFrame = animOffset;
         loops = 0;
     }
 
@@ -47,8 +47,8 @@ public class animate {
     }
 
     public TextureRegion getFrame() {
-        if (frames[cFrame] == null) System.out.println("it's not working");
-        return frames[cFrame]; }
+        return frames[cFrame];
+    }
 
     public int getLoopsNum() { return loops; }
 }

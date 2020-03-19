@@ -5,14 +5,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.oltvara.game.gamestates.play;
-import com.oltvara.game.world.wrldHandlers.chunk;
 import com.oltvara.game.world.wrldHandlers.physicsVars;
 import com.oltvara.game.mainGame;
 
-import static com.oltvara.game.mainGame.TILESIZE;
+import static com.oltvara.game.mainGame.*;
 import static com.oltvara.game.world.wrldHandlers.physicsVars.PPM;
-import static com.oltvara.game.mainGame.fct;
 
 public class tile {
 
@@ -48,7 +45,7 @@ public class tile {
         this.yFLIP = yFlip;
 
         txPick = (int)fct.random(0, txChoice.length - 1);
-        tx = mainGame.groundAtlas.findRegion(txChoice[txPick]);
+        tx = frTex.getGroundAtlas().findRegion(txChoice[txPick]);
     }
 
     public void render(SpriteBatch sb) {
@@ -57,16 +54,15 @@ public class tile {
         sb.setColor(Color.WHITE);
         sb.draw(
                 tx,
-                (relPOS.x) * physicsVars.PPM - TILESIZE / 2f,
-                (relPOS.y) * physicsVars.PPM - TILESIZE / 2f,
+                (relPOS.x) * PPM - TILESIZE / 2f,
+                (relPOS.y) * PPM - TILESIZE / 2f,
                 8, 8, 16, 16, xFLIP, yFLIP, 0
         );
         if (grassTX != null) {
             sb.draw(
                     grassTX,
-                    (relPOS.x) * physicsVars.PPM - TILESIZE / 2f,
-                    (relPOS.y) * physicsVars.PPM - TILESIZE / 2f,
-                    8, 8, 16, 16, 1, 1, 0
+                    (relPOS.x) * PPM - TILESIZE / 2f,
+                    (relPOS.y) * PPM - TILESIZE / 2f
             );
         }
 
@@ -108,7 +104,7 @@ public class tile {
 
     public void addGrass() {
         txPick = (int)fct.random(0, grassNames.length - 1);
-        grassTX = mainGame.groundAtlas.findRegion(grassNames[txPick]);
+        grassTX = frTex.getGroundAtlas().findRegion(grassNames[txPick]);
     }
 
     public boolean isEDGE() { return isRIGHT() || isLEFT(); }

@@ -30,6 +30,18 @@ public class map {
         }
     }
 
+    public void renderFront(SpriteBatch sb) {
+        for(chunk ch : chunks.values()){
+            ch.renderFront(sb);
+        }
+    }
+
+    public void update(float delta) {
+        for(chunk ch : chunks.values()){
+            ch.update(delta);
+        }
+    }
+
     public void addChunk(int offset) {
         if (hasChunk(offset - 1)) {
             leftHeight = chunks.get(offset - 1).getHeightMap()[chunks.get(offset - 1).getHeightMap().length - 1];

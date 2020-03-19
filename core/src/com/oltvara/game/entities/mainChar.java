@@ -12,6 +12,6 @@ public class mainChar extends sprite {
 
         Texture tex = mainGame.src.getTX("mainChar");
         TextureRegion[] sprites = TextureRegion.split(tex, 64, 64)[0];
-        setAnim(sprites, 1 / 12f);
+        setAnim(sprites, 1 / 12f, 0);
     }
 }

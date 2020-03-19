@@ -40,6 +40,10 @@ public class maths {
         return ThreadLocalRandom.current().nextFloat();
     }
 
+    public Integer randomInt(int bounds) {
+        return ThreadLocalRandom.current().nextInt(bounds);
+    }
+
     public double randomGaussian(double standDev, double mean) {
         return ((ThreadLocalRandom.current().nextGaussian() * standDev) + mean);
     }

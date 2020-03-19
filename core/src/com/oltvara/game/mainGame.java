@@ -4,11 +4,10 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.oltvara.game.handlers.*;
-import com.oltvara.game.world.wrldHandlers.treeTextureLoader;
+import com.oltvara.game.world.wrldHandlers.forestTextureLoader;
 
 public class mainGame extends ApplicationAdapter {
 
@@ -21,9 +20,9 @@ public class mainGame extends ApplicationAdapter {
 	public static final int TILESIZE = 16;
 	public static final int numTILES = 33;
 	public static final int numPowerTILES = 32;
-	public static final int tileBUFFER = 4;
+	public static final int tileBUFFER = 6;
 
-	public static final int cWIDTH = (int)(TILESIZE * numTILES - (TILESIZE * tileBUFFER));
+	public static final int cWIDTH = TILESIZE * numTILES - (TILESIZE * tileBUFFER);
 	public static final int cHEIGHT = (int)(cWIDTH / RATIO);
 
 	public static final int SCALE = (int)(dWIDTH / cWIDTH);
@@ -46,9 +45,9 @@ public class mainGame extends ApplicationAdapter {
 
 	public static maths fct;
 
-	public static TextureAtlas groundAtlas;
 
-	public static treeTextureLoader trTex;
+
+	public static forestTextureLoader frTex;
 
 	public mainGame() {
 		System.out.println(cWIDTH);
@@ -61,12 +60,9 @@ public class mainGame extends ApplicationAdapter {
 
 		fct = new maths();
 		src = new srcHandler();
-		trTex = new treeTextureLoader();
+		frTex = new forestTextureLoader();
 
 		src.importTX("resources/entities/charTest.png", "mainChar");
-		src.importTX("resources/environment/trees/1-1-1/layer1.png", "leaves-1-1-1");
-
-		groundAtlas = new TextureAtlas(Gdx.files.internal("resources/tiles/groundTiles.atlas"));
 
 		batch = new SpriteBatch();
 		mainCam = new OrthographicCamera();
@@ -97,6 +93,6 @@ public class mainGame extends ApplicationAdapter {
 	
 	@Override
 	public void dispose() {
-
+		frTex.dispose();
 	}
 }
