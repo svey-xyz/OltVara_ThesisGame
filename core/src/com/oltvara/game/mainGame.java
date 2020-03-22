@@ -27,7 +27,7 @@ public class mainGame extends ApplicationAdapter {
 
 	public static final int SCALE = (int)(dWIDTH / cWIDTH);
 
-	private static final float TICK = 1 / 60f;
+	public static final float TICK = 1 / 60f;
 	private float elapsedTime;
 
 	private SpriteBatch batch;
@@ -50,7 +50,6 @@ public class mainGame extends ApplicationAdapter {
 	public static forestTextureLoader frTex;
 
 	public mainGame() {
-		System.out.println(cWIDTH);
 	}
 
 	@Override
@@ -79,11 +78,11 @@ public class mainGame extends ApplicationAdapter {
 
 		elapsedTime += Gdx.graphics.getDeltaTime();
 		while (elapsedTime >= TICK) {
-			elapsedTime -= TICK;
 			GSH.update(TICK);
-			GSH.render();
 			inputControl.update();
+			elapsedTime -= TICK;
 		}
+		GSH.render();
 	}
 
 	@Override

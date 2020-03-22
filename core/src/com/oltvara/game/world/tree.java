@@ -19,8 +19,8 @@ public class tree {
 
     private ArrayList<leafLayer> leaves;
     private Color leafCol, trunkCol;
-    private Vector2 relPOS;
-    private float size;
+    private Vector2 relPOS, renPOS;
+    private int size;
     private TextureRegion trunkTex;
 
     public tree(Vector2 pos, int chunkOffset, int treeType) {
@@ -41,6 +41,10 @@ public class tree {
         relPOS.x = (pos.x + 0.5f + chunkOffset) * TILESIZE / PPM + trOffset.x;
         relPOS.y = (pos.y + 0.5f) * TILESIZE / PPM + trOffset.y;
 
+        renPOS = new Vector2();
+        renPOS.x = relPOS.x * PPM - size / 2f;
+        renPOS.y = relPOS.y * PPM - size / 2f;
+
         trunkCol = fct.gaussianCol(frTex.getTrunkCol(treeType), trSDCol);
 
         for (Array<TextureAtlas.AtlasRegion> layer : frTex.getLeaves(frTex.TREE, txName)) {
@@ -54,22 +58,28 @@ public class tree {
         sb.begin();
         sb.setColor(trunkCol);
         sb.draw(trunkTex,
-                (relPOS.x * physicsVars.PPM - size / 2),
-                (relPOS.y * physicsVars.PPM - size / 2)
+                (relPOS.x * physicsVars.PPM - size / 2f),
+                (relPOS.y * physicsVars.PPM - size / 2f)
         );
-
-
         sb.end();
 
-        for (leafLayer leaf : leaves) {
-            leaf.render(sb, leaf.getCol());
+        for (int i = 0; i < leaves.size(); i++) {
+            leaves.get(i).render(sb, leaves.get(i).getCol());
         }
 
     }
 
     public void update(float dt) {
-        for (leafLayer leaf : leaves) {
-            leaf.update(dt);
+        for (int i = 0; i < leaves.size(); i++) {
+            leaves.get(i).update(dt);
         }
+    }
+
+    public Vector2 getRenPOS() {
+        return renPOS;
+    }
+
+    public int getSize() {
+        return size;
     }
 }

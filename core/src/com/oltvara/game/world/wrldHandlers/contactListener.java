@@ -12,24 +12,23 @@ public class contactListener implements ContactListener {
         Fixture cfa = c.getFixtureA();
         Fixture cfb = c.getFixtureB();
 
+        //check if character is touching ground
+        //LIBGDX determines which fixture is a or b so check both
         if(cfa.getUserData() != null && cfa.getUserData().equals("sensor")) {
             charContact++;
         }
-
         if(cfb.getUserData() != null && cfb.getUserData().equals("sensor")) {
             charContact++;
         }
     }
 
     public void endContact(Contact c) {
-
         Fixture cfa = c.getFixtureA();
         Fixture cfb = c.getFixtureB();
 
         if(cfa.getUserData() != null && cfa.getUserData().equals("sensor")) {
             charContact--;
         }
-
         if(cfb.getUserData() != null && cfb.getUserData().equals("sensor")) {
             charContact--;
         }
@@ -37,10 +36,6 @@ public class contactListener implements ContactListener {
 
     public boolean isCharContact() {
         return charContact > 0;
-    }
-
-    public Array<Body> getBodiesToRemove() {
-        return new Array<Body>();
     }
 
     public void preSolve(Contact contact, Manifold oldManifold) {}

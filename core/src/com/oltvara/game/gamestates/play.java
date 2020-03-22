@@ -3,6 +3,7 @@ package com.oltvara.game.gamestates;
 import static com.oltvara.game.mainGame.*;
 import static com.oltvara.game.world.wrldHandlers.physicsVars.PPM;
 
+import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
@@ -12,7 +13,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.oltvara.game.entities.mainChar;
 import com.oltvara.game.world.map;
-import com.oltvara.game.world.tree;
 import com.oltvara.game.world.wrldHandlers.contactListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -33,24 +33,16 @@ public class play extends gameState{
     private Box2DDebugRenderer bdRen;
     private Vector3 targetPos;
     private final float CAMSPEEDMODIFER = 300f;
-    private float camLastY;
-    private float yDiff, dist;
 
     private OrthographicCamera boxCam;
-
-    //for loaded Tile maps
-    private TiledMap tileMap;
     private OrthogonalTiledMapRenderer tmr;
-
-    public static map getMapControl() {
-        return mapControl;
-    }
 
     //for random map generation
     private static map mapControl;
-    private float camRightPoint, camLeftPoint;
+    private float camRightPoint, camLeftPoint, camTopPoint, camBottomPoint;
     private int cOffset = 0, lOffset =0;
     private int leftPoint, rightPoint, leftPointTotal, rightPointTotal;
+    private static Vector2 bottomLeftViewPoint;
 
     private static Array<Body> bodiesToRemove;
 
@@ -62,19 +54,16 @@ public class play extends gameState{
     private final float ACC = 0.1f;
     private final int JUMP = 50;
     private final int MAXJUMPVEL = 3;
-    private float jump;
-    private Vector2 pos, vel;
-    private int holdTime;
+    private Vector2 pos;
     private boolean jumping = false;
 
     private boolean movingY;
-
-
 
     public play(stateHandler GSH) {
         super(GSH);
 
         bodiesToRemove = new Array<Body>();
+        bottomLeftViewPoint = new Vector2();
 
         //setup physics stuff
         boxWorld = new World(new Vector2(0, -9.81f), true);
@@ -95,23 +84,28 @@ public class play extends gameState{
         mainCam.position.set(new Vector3(pos.x * PPM, pos.y * PPM, mainCam.position.z));
 
         //map generation init
-        mapControl = new map(30);
+        mapControl = new map(25);
         mapControl.addChunk(cOffset);
     }
 
     public void handleInput() {
         charBod = myChar.getBod();
         pos = charBod.getPosition();
-        vel = charBod.getLinearVelocity();
+        Vector2 vel = charBod.getLinearVelocity();
 
+        //set jump state
         if (inputControl.isTap(inputControl.JUMPBUT) && cl.isCharContact()) {
             jumping = true;
         }
+        if (inputControl.isReleased(inputControl.JUMPBUT)) {
+            jumping = false;
+        }
 
+        //Control jump height based on length button was pressed while still allowing jump on tap not on release
         if (inputControl.isPressed(inputControl.JUMPBUT) && jumping) {
             if (charBod.getLinearVelocity().y < MAXJUMPVEL) {
-                holdTime = inputControl.heldTime(inputControl.JUMPBUT);
-                jump = JUMP * (holdTime / 4f);
+                int holdTime = inputControl.heldTime(inputControl.JUMPBUT);
+                float jump = JUMP * (holdTime / 4f);
                 jump = (int) fct.constrain(jump, JUMP, 200);
 
                 charBod.applyForceToCenter(0, jump, true);
@@ -120,10 +114,7 @@ public class play extends gameState{
             }
         }
 
-        if (inputControl.isReleased(inputControl.JUMPBUT)) {
-            jumping = false;
-        }
-
+        //apply force for movement
         if (inputControl.isPressed(inputControl.RIGHT) && vel.x < MAXSPEED) {
             if (cl.isCharContact()) {
                 charBod.applyLinearImpulse(ACC, 0f, pos.x, pos.y, true);
@@ -131,7 +122,6 @@ public class play extends gameState{
                 charBod.applyLinearImpulse(ACC/2, 0f, pos.x, pos.y, true);
             }
         }
-
         if (inputControl.isPressed(inputControl.LEFT) && vel.x > -MAXSPEED) {
             if (cl.isCharContact()) {
                 charBod.applyLinearImpulse(-ACC, 0f, pos.x, pos.y, true);
@@ -140,9 +130,45 @@ public class play extends gameState{
             }
         }
 
+        //stop movement - better than friction
         if (!inputControl.isPressed(inputControl.LEFT) && !inputControl.isPressed(inputControl.RIGHT)) {
             charBod.applyLinearImpulse(-(vel.x / 4), 0f, pos.x, pos.y, true);
         }
+    }
+
+    //Might need to apply Euler's integration to avoid weird rendering issues with de-synchronization from physics update.
+    private void cameraMovement() {
+        float yDiff = Math.abs(mainCam.position.y - pos.y * PPM);
+
+        //controlled Y movement
+        if (yDiff > cHEIGHT / 4f) { movingY = true; }
+        if (yDiff < TILESIZE / 4f) { movingY = false; }
+
+        //Set target pos based on yDiff
+        if (movingY) {
+            targetPos = new Vector3(pos.x * PPM, pos.y * PPM + cHEIGHT / 6f, mainCam.position.z);
+        }
+        if (!movingY) {
+            targetPos = new Vector3(pos.x * PPM, mainCam.position.y, mainCam.position.z);
+        }
+
+        //distance between camera and character position determines lerp speed
+        float dist = fct.distance(mainCam.position.x, mainCam.position.y, targetPos.x, targetPos.y);
+
+        //don't go below bottom block
+        targetPos.y = (float)fct.constrain(targetPos.y, cHEIGHT / 2f, 1000000000f);
+
+        //lerping
+        final float speed=(dist /CAMSPEEDMODIFER), ySpeed = speed/ 10, ispeed=1.0f-speed, yIsSpeed=1.0f-ySpeed;
+        Vector3 cameraPosition = mainCam.position;
+        cameraPosition.scl(ispeed, yIsSpeed, 1);
+        targetPos.scl(speed, ySpeed, 1);
+        cameraPosition.add(targetPos);
+
+        //cameraPosition.set(fct.roundVec(cameraPosition));
+
+        mainCam.position.set(cameraPosition);
+        mainCam.update();
     }
 
     public void update(float delta) {
@@ -169,18 +195,18 @@ public class play extends gameState{
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        //System.out.println();
-
         //for drawing loaded maps
-        //tmr.setView(mainCam);
-        //tmr.render();
+        /*tmr.setView(mainCam);
+        tmr.render();*/
 
         batch.setProjectionMatrix(mainCam.combined);
 
-        mapControl.render(batch);
+        mapControl.renderBack(batch);
+        mapControl.renderMain(batch);
         myChar.render(batch, Color.WHITE);
         mapControl.renderFront(batch);
 
+        //For debugging box2D stuff.
         if (DEBUG) {
             boxCam.position.set(mainCam.position).scl(1/PPM);
             boxCam.update();
@@ -189,40 +215,7 @@ public class play extends gameState{
         }
     }
 
-    private void cameraMovement() {
-        yDiff = Math.abs(mainCam.position.y - pos.y * PPM);
-
-        //controlled Y movement
-        if (yDiff > cHEIGHT / 4f) { movingY = true; }
-        if (yDiff < TILESIZE / 4f) { movingY = false; }
-
-        //Set target pose based on yDiff
-        if (movingY) {
-            targetPos = new Vector3(pos.x * PPM, pos.y * PPM + cHEIGHT / 6f, mainCam.position.z);
-        }
-        if (!movingY) {
-            targetPos = new Vector3(pos.x * PPM, mainCam.position.y, mainCam.position.z);
-        }
-
-        //distance between camera and character position determines lerp speed
-        dist = fct.distance(mainCam.position.x, mainCam.position.y, targetPos.x, targetPos.y);
-
-        //don't go below bottom block
-        targetPos.y = (float)fct.constrain(targetPos.y, cHEIGHT / 2f, 1000000000f);
-
-        //lerping
-        final float speed=(dist/CAMSPEEDMODIFER), ySpeed = speed/ 10, ispeed=1.0f-speed, yIsSpeed=1.0f-ySpeed;
-        Vector3 cameraPosition = mainCam.position;
-        cameraPosition.scl(ispeed, yIsSpeed, 1);
-        targetPos.scl(speed, ySpeed, 1);
-        cameraPosition.add(targetPos);
-
-        //cameraPosition.set(fct.roundVec(cameraPosition));
-
-        mainCam.position.set(cameraPosition);
-        mainCam.update();
-    }
-
+    //for queuing physics bodies to destroy from other methods.
     public static void addBodToDestroy(Body b) {
         bodiesToRemove.add(b);
     }
@@ -233,6 +226,7 @@ public class play extends gameState{
             lOffset = cOffset;
         }
 
+        //Figure out camera viewport compared to world units and furthest points of world in chunk
         camRightPoint = (mainCam.position.x + mainCam.viewportWidth / 2);
         camLeftPoint = mainCam.position.x - mainCam.viewportWidth / 2;
 
@@ -242,23 +236,23 @@ public class play extends gameState{
         rightPointTotal = numTILES * TILESIZE * (cOffset + 1);
         leftPointTotal = numTILES * TILESIZE * cOffset;
 
-        /*rightPoint = lenPower2 * mainGame.TILESIZE + (cOffset + 1);
-        leftPoint = mainGame.TILESIZE + lenPower2 * mainGame.TILESIZE * cOffset;*/
+        bottomLeftViewPoint.x = camLeftPoint;
+        bottomLeftViewPoint.y = mainCam.position.y - mainCam.viewportHeight / 2;
 
+        //remove chunks once they're out of view
         if (mainCam.position.x > rightPointTotal + mainCam.viewportWidth / 2) {
             mapControl.removeChunk(cOffset - 1);
             cOffset++;
-
         }
         if (mainCam.position.x < leftPointTotal - mainCam.viewportWidth / 2) {
             mapControl.removeChunk(cOffset + 1);
             cOffset--;
         }
 
+        //add chunks just before they come into view- buffer can be adjusted in mainGame
         if (camRightPoint > rightPointTotal - (TILESIZE * tileBUFFER / 2f) && !mapControl.hasChunk(cOffset + 1)) {
             mapControl.addChunk(cOffset + 1);
         }
-
         if (camLeftPoint < leftPointTotal + (TILESIZE * tileBUFFER / 2f) && !mapControl.hasChunk(cOffset - 1)) {
             mapControl.addChunk(cOffset - 1);
         }
@@ -275,7 +269,7 @@ public class play extends gameState{
         defBod.type = BodyDef.BodyType.DynamicBody;
         Body body= boxWorld.createBody(defBod);
 
-        box.setAsBox(8 / PPM,31 / PPM);
+        box.setAsBox(7 / PPM,30.5f / PPM);
         defFix.shape = box;
         defFix.filter.categoryBits = physicsVars.bitCHAR;
         defFix.filter.maskBits = physicsVars.bitGROUND;
@@ -283,7 +277,7 @@ public class play extends gameState{
         body.createFixture(defFix).setUserData("mainChar");
 
         //create foot sensor
-        box.setAsBox(7.5f / PPM, 2 / PPM, new Vector2(0, -31 / PPM), 0);
+        box.setAsBox(6 / PPM, 0.5f / PPM, new Vector2(0.25f / PPM, -30 / PPM), 0);
         defFix.shape = box;
         defFix.filter.categoryBits = physicsVars.bitCHAR;
         defFix.filter.maskBits = physicsVars.bitGROUND;
@@ -294,13 +288,14 @@ public class play extends gameState{
         myChar = new mainChar(body);
     }
 
-    //for loading premade maps
+    //for loading pre-made maps
     private void createTiles() {
         BodyDef defBod = new BodyDef();
         FixtureDef defFix = new FixtureDef();
 
         //load tiled map
-        tileMap = new TmxMapLoader().load("resources/tiles/mapTest.tmx");
+        //for loaded Tile maps
+        TiledMap tileMap = new TmxMapLoader().load("resources/tiles/mapTest.tmx");
         tmr = new OrthogonalTiledMapRenderer(tileMap);
 
         TiledMapTileLayer layer = (TiledMapTileLayer) tileMap.getLayers().get("Ground");
@@ -335,8 +330,13 @@ public class play extends gameState{
         }
     }
 
-    public  void dispose() {
+    public  void dispose() {}
 
+    public static Vector2 getBottomLeftViewPoint() {
+        return bottomLeftViewPoint;
     }
 
+    public static Vector2 getViewporSize() {
+        return new Vector2(1, 1);
+    }
 }

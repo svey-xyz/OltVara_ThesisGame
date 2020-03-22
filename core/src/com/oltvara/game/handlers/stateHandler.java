@@ -24,7 +24,7 @@ public class stateHandler {
     public mainGame game() { return game; }
 
     public void update(float delta) {
-        gameStates.peek().update(0.0167f);
+        gameStates.peek().update(delta);
 
     }
 

@@ -76,7 +76,7 @@ public class maths {
     }
 
     public double constrain(double value, double min) {
-        return Math.min(value, min);
+        return Math.max(value, min);
     }
 
     public Vector3 roundVec(Vector3 vec) {

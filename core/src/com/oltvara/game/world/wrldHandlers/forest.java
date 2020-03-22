@@ -15,8 +15,7 @@ public class forest {
 
     private ArrayList<tree> trees;
     private ArrayList<bush> bushes;
-    private HashMap<Vector2, Integer> treesPos;
-    private ArrayList<Vector2> bushPos;
+    private HashMap<Vector2, Integer> tileSpaces;
     private int[] heightMap;
 
     private int offset;
@@ -24,10 +23,9 @@ public class forest {
     private final float MINDISTSMALL = 3f;
     private final float MINDISTMED = 5f;
 
-    forest(int offset, ArrayList<Vector2> bushPos, HashMap<Vector2, Integer> treesPos, int[] heightMap) {
+    forest(int offset,  HashMap<Vector2, Integer> tileSpacing, int[] heightMap) {
         this.offset = offset;
-        this.bushPos = bushPos;
-        this.treesPos = treesPos;
+        this.tileSpaces = tileSpacing;
         this.heightMap = heightMap;
 
         trees = new ArrayList<>();
@@ -36,7 +34,6 @@ public class forest {
         createTrees();
         Collections.shuffle(trees);
 
-        createBushes();
         Collections.shuffle(bushes);
     }
 
@@ -48,67 +45,76 @@ public class forest {
         //Sort through the tiles from left to right to be able to do distance calc without having to iterate twice, and avoiding concurrent modification
         for (int x=0; x<mainGame.numTILES; x++) {
             pos = new Vector2(x, heightMap[x]);
-            if (treesPos.get(pos) == 1) {
-                rand = (float)fct.random();
-                if (fct.distance(prevPos, pos) > MINDISTSMALL) {
-                    if (rand < 0.2) {
-                        trees.add(new tree(pos, offset, frTex.SMALLBUSHYTREE));
-                        prevPos = pos;
-                    } else if (rand < 0.3) {
-                        trees.add(new tree(pos, offset, frTex.SMALLSPIKYTREE));
+            //System.out.println("Pos: " + pos + ", treeVal: " + treesPos.get(pos));
+            if (tileSpaces.get(pos) != null) {
+                rand = (float) fct.random();
+
+                if (tileSpaces.get(pos) > 0) {
+                    if (rand < 0.5) {
+                        bushes.add(new bush(pos, offset, frTex.MEDIUMBUSH));
+                    }
+                }
+
+                if (tileSpaces.get(pos) == 2) {
+                    if (fct.distance(prevPos, pos) > MINDISTSMALL) {
+                        if (rand < 0.2) {
+                            trees.add(new tree(pos, offset, frTex.SMALLBUSHYTREE));
+                            prevPos = pos;
+                        } else if (rand < 0.3) {
+                            trees.add(new tree(pos, offset, frTex.SMALLSPIKYTREE));
+                        }
+                    }
+                }
+
+                if (tileSpaces.get(pos) == 3) {
+                    if (fct.distance(prevPos, pos) > MINDISTMED) {
+                        if (rand < 0.15) {
+                            trees.add(new tree(pos, offset, frTex.MEDIUMBUSHYTREE));
+                            prevPos = pos;
+                        } else if (rand < 0.2) {
+                            trees.add(new tree(pos, offset, frTex.MEDIUMSPIKYTREE));
+                            prevPos = pos;
+                        }
                     }
                 }
             }
+        }
+    }
 
-            if (treesPos.get(pos) == 2) {
-                rand = (float)fct.random();
-                if (fct.distance(prevPos, pos) > MINDISTMED) {
-                    if (rand < 0.15) {
-                        trees.add(new tree(pos, offset, frTex.MEDIUMBUSHYTREE));
-                        prevPos = pos;
-                    } else if (rand < 0.2) {
-                        trees.add(new tree(pos, offset, frTex.MEDIUMSPIKYTREE));
-                        prevPos = pos;
-                    }
-                }
+    //Rendering layers
+    //Use the inFrame function to make render calls only for object on screen
+    void renderFront(SpriteBatch sb) {
+        for (int i = bushes.size() - 1; i >= 0; i--) {
+            if (chunk.inFrame(bushes.get(i).getRenPOS(), bushes.get(i).getSize())) {
+                bushes.get(i).render(sb);
+            }
+        }
+        for (int i = trees.size() - 1; i >= 0; i--) {
+            if (chunk.inFrame(trees.get(i).getRenPOS(), trees.get(i).getSize())) {
+                trees.get(i).render(sb);
             }
         }
     }
 
-    private void createBushes() {
-        float rand;
-        for (Vector2 pos : bushPos) {
-            rand = (float)fct.random();
-            if (rand < 0.5) {
-                bushes.add(new bush(pos, offset, frTex.MEDIUMBUSH));
+    void renderBack(SpriteBatch sb) {
+        for (int i = trees.size() - 1; i >= 0; i--) {
+            if (chunk.inFrame(trees.get(i).getRenPOS(), trees.get(i).getSize())) {
+                trees.get(i).render(sb);
             }
         }
-    }
-
-    public void renderFront(SpriteBatch sb) {
-        for (bush bs : bushes) {
-            bs.render(sb);
-        }
-        for (tree tr : trees) {
-            tr.render(sb);
-        }
-    }
-
-    public void renderBack(SpriteBatch sb) {
-        for (tree tr : trees) {
-            tr.render(sb);
-        }
-        for (bush bs : bushes) {
-            bs.render(sb);
+        for (int i = bushes.size() - 1; i >= 0; i--) {
+            if (chunk.inFrame(bushes.get(i).getRenPOS(), bushes.get(i).getSize())) {
+                bushes.get(i).render(sb);
+            }
         }
     }
 
     public void update(float delta) {
-        for (tree tr : trees) {
-            tr.update(delta);
+        for (int i = bushes.size() - 1; i >= 0; i--) {
+            bushes.get(i).update(delta);
         }
-        for (bush bs : bushes) {
-            bs.update(delta);
+        for (int i = trees.size() - 1; i >= 0; i--) {
+            trees.get(i).update(delta);
         }
     }
 

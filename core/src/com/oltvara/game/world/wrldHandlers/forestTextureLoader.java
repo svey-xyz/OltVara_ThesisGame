@@ -24,6 +24,12 @@ public class forestTextureLoader {
     public final int MEDIUMSPIKYTREE = 2;
     public final int SMALLSPIKYTREE = 3;
 
+    public final int GROUND = 0;
+    public final int LIVEGROUND = 1;
+    public final int DOUBLELIVEGROUND = 2;
+    public final int ROCKS = 3;
+    public final int GRASS = 4;
+
     public final int MEDIUMBUSH = 0;
 
     private TextureAtlas txAtlas;
@@ -31,20 +37,27 @@ public class forestTextureLoader {
 
     private HashMap<Integer, treeType> treeTypes = new HashMap<Integer, treeType>();
     private HashMap<Integer, bushType> bushTypes = new HashMap<Integer, bushType>();
+    private HashMap<Integer, String[]> tileNames = new HashMap<Integer, String[]>();;
 
     private HashMap<String, ArrayList<Array<TextureAtlas.AtlasRegion>>> leafTextures;
     private HashMap<String, TextureRegion> trunks;
 
     private HashMap<String, ArrayList<Array<TextureAtlas.AtlasRegion>>> bushTextures;
+    private HashMap<String, TextureRegion> tiles;
 
     public forestTextureLoader() {
+        groundAtlas = new TextureAtlas(Gdx.files.internal("resources/tiles/groundTiles.atlas"));
+
         leafTextures = new HashMap<>();
         trunks = new HashMap<>();
 
         bushTextures = new HashMap<>();
 
+        tiles = new HashMap<>();
+
         createTreeTypes();
         createBushTypes();
+        loadTiles();
 
         for (treeType trType : treeTypes.values()) {
             for (String treeName : trType.getNames()) {
@@ -57,8 +70,6 @@ public class forestTextureLoader {
                 loadBushTextures(bsName);
             }
         }
-
-        groundAtlas = new TextureAtlas(Gdx.files.internal("resources/tiles/groundTiles.atlas"));
     }
 
     private void loadBushTextures(String name) {
@@ -140,10 +151,17 @@ public class forestTextureLoader {
         return null;
     }
 
-    public TextureAtlas getGroundAtlas() { return groundAtlas; }
+    public String[] getTileList(Integer ls) {
+        return tileNames.get(ls);
+    }
+
+    public TextureRegion getTileTex(String name) {
+        return tiles.get(name);
+    }
 
     public void dispose() {
         txAtlas.dispose();
+        groundAtlas.dispose();
     }
 
     private void createTreeTypes() {
@@ -153,7 +171,7 @@ public class forestTextureLoader {
 
         treeTypes.put(MEDIUMBUSHYTREE, new treeType(new Vector2((TILESIZE / 2f / PPM), (256 / 2f / PPM)),
                 fct.fromRGB(240, 80, 80), fct.fromRGB(235, 205, 175), 0.08f, 0.01f,
-                new String[]{"medium_1-1-1", "medium_1-1-2"}));
+                new String[]{"medium_1-1-1", "medium_1-1-2", "medium_1-1-3"}));
 
         treeTypes.put(MEDIUMSPIKYTREE, new treeType(new Vector2((TILESIZE / 2f / PPM), (256 / 2f / PPM)),
                 fct.fromRGB(255, 180, 80), fct.fromRGB(245, 116, 67), 0.05f, 0.004f,
@@ -168,5 +186,19 @@ public class forestTextureLoader {
         bushTypes.put(MEDIUMBUSH, new bushType(new Vector2(0, (24 / PPM)),
                 fct.fromRGB(240, 240, 50), 0.08f,
                 new String[]{"medium_1-1-1", "medium_1-1-2", "medium_1-1-3", "medium_1-1-4"}));
+    }
+
+    private void loadTiles() {
+        tileNames.put(GRASS, new String[]{"grass-1-1", "grass-1-2", "grass-1-3"});
+        tileNames.put(GROUND, new String[]{"ground-1-1", "ground-1-2", "groundSpeckle-1-1", "groundSpeckle-1-2"});
+        tileNames.put(ROCKS, new String[]{"groundRock-1-1", "groundRockSpeckle-1-1"});
+        tileNames.put(LIVEGROUND, new String[]{"groundLive-1-1", "groundLiveSpeckle-1-1"});
+        tileNames.put(DOUBLELIVEGROUND, new String[]{"groundDLive-1-1", "groundDLiveSpeckle-1-1"});
+
+        for (String[] listNames : tileNames.values()) {
+            for (String name : listNames) {
+                tiles.put(name, groundAtlas.findRegion(name));
+            }
+        }
     }
 }
