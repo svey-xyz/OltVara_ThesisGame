@@ -30,16 +30,15 @@ public class bush {
         relPOS.x = (pos.x + 0.5f + chunkOffset) * TILESIZE / PPM + bsOffset.x;
         relPOS.y = (pos.y + 0.5f) * TILESIZE / PPM + bsOffset.y;
 
-        size = frTex.getLeaves(frTex.BUSH, txName).get(0).size;
+        size = frTex.getLeaves(frTex.BUSH, txName).get(0).get(0).originalWidth;
 
         renPOS = new Vector2();
         renPOS.x = relPOS.x * PPM - size / 2f;
         renPOS.y = relPOS.y * PPM - size / 2f;
 
         for (Array<TextureAtlas.AtlasRegion> layer : frTex.getLeaves(frTex.BUSH, txName)) {
-            Color leafCol = fct.gaussianCol(frTex.getLeafCols(frTex.BUSH, bushType), lfSDCol);
             int rand = fct.randomInt(12);
-            leaves.add(new leafLayer(relPOS, layer, leafCol, rand));
+            leaves.add(new leafLayer(relPOS, layer, fct.gaussianCol(frTex.getLeafCols(frTex.BUSH, bushType), lfSDCol), rand));
         }
     }
 
@@ -60,6 +59,6 @@ public class bush {
     }
 
     public int getSize() {
-        return size * 2;
+        return size;
     }
 }

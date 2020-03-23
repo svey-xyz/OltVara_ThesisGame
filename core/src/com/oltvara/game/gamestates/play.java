@@ -39,9 +39,9 @@ public class play extends gameState{
 
     //for random map generation
     private static map mapControl;
-    private float camRightPoint, camLeftPoint, camTopPoint, camBottomPoint;
+    private float camRightPoint, camLeftPoint;
     private int cOffset = 0, lOffset =0;
-    private int leftPoint, rightPoint, leftPointTotal, rightPointTotal;
+    private int leftPointTotal, rightPointTotal;
     private static Vector2 bottomLeftViewPoint;
 
     private static Array<Body> bodiesToRemove;
@@ -140,7 +140,8 @@ public class play extends gameState{
     private void cameraMovement() {
         float yDiff = Math.abs(mainCam.position.y - pos.y * PPM);
 
-        //controlled Y movement
+        //controlled Y movement - creates Mario style camera follow where camera only follows X unless yDiff is big enough
+        //this is nice since the camera following every jump is annoying af
         if (yDiff > cHEIGHT / 4f) { movingY = true; }
         if (yDiff < TILESIZE / 4f) { movingY = false; }
 
@@ -227,11 +228,9 @@ public class play extends gameState{
         }
 
         //Figure out camera viewport compared to world units and furthest points of world in chunk
+        //These variables are created on startup rather than in this method to save memory instead of creating them every render frame
         camRightPoint = (mainCam.position.x + mainCam.viewportWidth / 2);
         camLeftPoint = mainCam.position.x - mainCam.viewportWidth / 2;
-
-        rightPoint = (numTILES - tileBUFFER) * TILESIZE * (cOffset + 1);
-        leftPoint = tileBUFFER * TILESIZE + numTILES * TILESIZE * cOffset;
 
         rightPointTotal = numTILES * TILESIZE * (cOffset + 1);
         leftPointTotal = numTILES * TILESIZE * cOffset;

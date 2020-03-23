@@ -59,7 +59,7 @@ public class mainGame extends ApplicationAdapter {
 
 		fct = new maths();
 		src = new srcHandler();
-		frTex = new forestTextureLoader();
+		frTex = new forestTextureLoader("Biome1");
 
 		src.importTX("resources/entities/charTest.png", "mainChar");
 
