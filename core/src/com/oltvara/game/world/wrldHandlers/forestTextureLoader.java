@@ -35,6 +35,7 @@ public class forestTextureLoader {
     public final int DOUBLELIVEGROUND = 2;
     public final int ROCKS = 3;
     public final int GRASS = 4;
+    public final int SPECIALGROUND = 5;
 
     public final int SMALLROCK = 0;
     public final int SMALLROCKMOSS = 1;
@@ -239,7 +240,7 @@ public class forestTextureLoader {
                 new String[]{"small_1-2-1", "small_1-2-2", "small_1-2-1_v2", "small_1-2-2_v2"}));
 
         treeTypes.put(COLOURFULTREE, new treeType(new Vector2((TILESIZE / 2f / PPM), (256 / 2f / PPM)),
-                fct.fromRGB(240, 90, 30), fct.fromRGB(235, 215, 200), 0.3f, 0.001f,
+                fct.fromRGB(240, 90, 30), fct.fromRGB(240, 235, 235), 0.3f, 0.001f,
                 new String[]{"front_1-3-1", "back_1-3-1"}));
     }
 
@@ -272,6 +273,7 @@ public class forestTextureLoader {
         tileNames.put(ROCKS, new String[]{"groundRock-1-1", "groundRockSpeckle-1-1"});
         tileNames.put(LIVEGROUND, new String[]{"groundLive-1-1", "groundLiveSpeckle-1-1"});
         tileNames.put(DOUBLELIVEGROUND, new String[]{"groundDLive-1-1", "groundDLiveSpeckle-1-1"});
+        tileNames.put(SPECIALGROUND, new String[]{"groundSpecial-1-1", "groundSpecial-1-2", "groundSpecial-1-3"});
 
         for (String[] listNames : tileNames.values()) {
             for (String name : listNames) {

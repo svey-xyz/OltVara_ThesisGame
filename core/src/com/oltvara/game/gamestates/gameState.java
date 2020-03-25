@@ -23,7 +23,7 @@ public abstract class gameState {
 
     }
 
-    public abstract void handleInput();
+    public abstract void handleInput(float delta);
 
     public abstract void update(float delta);
 

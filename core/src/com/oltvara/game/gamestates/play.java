@@ -3,20 +3,21 @@ package com.oltvara.game.gamestates;
 import static com.oltvara.game.mainGame.*;
 import static com.oltvara.game.world.wrldHandlers.physicsVars.PPM;
 
-import com.badlogic.gdx.graphics.Camera;
-import com.badlogic.gdx.graphics.Color;
+import box2dLight.DirectionalLight;
+import box2dLight.PointLight;
+import box2dLight.RayHandler;
+import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.oltvara.game.entities.mainChar;
 import com.oltvara.game.world.map;
 import com.oltvara.game.world.wrldHandlers.contactListener;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.oltvara.game.handlers.inputControl;
@@ -37,6 +38,13 @@ public class play extends gameState{
     private OrthographicCamera boxCam;
     private OrthogonalTiledMapRenderer tmr;
 
+    public static RayHandler rayHandler;
+    private RayHandler wrldLights, frtLight;
+    private PointLight charLight;
+    private PointLight wrldLight;
+    private DirectionalLight dL1, dL2, dL3;
+    Matrix4 lightRenderPos;
+
     //for random map generation
     private static map mapControl;
     private float camRightPoint, camLeftPoint;
@@ -51,7 +59,7 @@ public class play extends gameState{
     private mainChar myChar;
     private Body charBod;
     private final float MAXSPEED = 1.5f;
-    private final float ACC = 0.1f;
+    private final float ACC = 2f;
     private final int JUMP = 50;
     private final int MAXJUMPVEL = 3;
     private Vector2 pos;
@@ -75,6 +83,20 @@ public class play extends gameState{
         boxCam = new OrthographicCamera();
         boxCam.setToOrtho(false, mainGame.cWIDTH / PPM, mainGame.cHEIGHT / PPM);
 
+        rayHandler = new RayHandler(boxWorld);
+        rayHandler.setAmbientLight(0.5f);
+        rayHandler.setBlur(true);
+
+        wrldLights = new RayHandler(boxWorld);
+        wrldLights.setBlur(true);
+        wrldLights.resizeFBO(100, 100);
+        wrldLights.setCulling(true);
+        RayHandler.useDiffuseLight(true);
+
+        frtLight = new RayHandler(boxWorld);
+        wrldLights.setBlur(true);
+        frtLight.setAmbientLight(1f);
+
         //static - unaffected; dynamic - affected; kinematic - unaffected but can still move
         //create player
         createChar();
@@ -83,12 +105,43 @@ public class play extends gameState{
         pos = charBod.getPosition();
         mainCam.position.set(new Vector3(pos.x * PPM, pos.y * PPM, mainCam.position.z));
 
+        Filter filter = new Filter();
+        filter.categoryBits = physicsVars.bitCHAR; // Value listed below
+        filter.maskBits = physicsVars.bitGROUND;
+
+        charLight = new PointLight(rayHandler, 200, Color.WHITE, 128 / PPM, 0, 0);
+        charLight.setSoftnessLength(0.2f);
+        charLight.attachToBody(charBod);
+        charLight.setActive(true);
+        //charLight.setSoft(true);
+        //charLight.setContactFilter("Sensor");
+        charLight.setIgnoreAttachedBody(true);
+        charLight.setContactFilter(filter);
+
+        dL1 = new DirectionalLight(wrldLights, 200, Color.WHITE, -91);
+        dL1.setSoftnessLength(1.5f);
+        //dL1.setSoft(true);
+        dL1.setContactFilter(filter);
+        //dL1.setPosition(0, 1000);
+
+        dL2 = new DirectionalLight(frtLight, 200, Color.WHITE, -91);
+        dL2.setSoftnessLength(1.5f);
+        //dL1.setSoft(true);
+        dL2.setContactFilter(filter);
+
+        /*wrldLight = new PointLight(rayHandler, 500, fct.fromRGB(90, 80, 80), 600 / PPM, 0, 0);
+        wrldLight.setSoftnessLength(2f);
+        //wrldLight.setXray(true);
+        wrldLight.setStaticLight(true);
+        wrldLight.setContactFilter(filter);*/
+
+
         //map generation init
         mapControl = new map(25);
         mapControl.addChunk(cOffset);
     }
 
-    public void handleInput() {
+    public void handleInput(float delta) {
         charBod = myChar.getBod();
         pos = charBod.getPosition();
         Vector2 vel = charBod.getLinearVelocity();
@@ -105,7 +158,7 @@ public class play extends gameState{
         if (inputControl.isPressed(inputControl.JUMPBUT) && jumping) {
             if (charBod.getLinearVelocity().y < MAXJUMPVEL) {
                 int holdTime = inputControl.heldTime(inputControl.JUMPBUT);
-                float jump = JUMP * (holdTime / 4f);
+                float jump = JUMP * (holdTime / 5f) * delta;
                 jump = (int) fct.constrain(jump, JUMP, 200);
 
                 charBod.applyForceToCenter(0, jump, true);
@@ -117,22 +170,22 @@ public class play extends gameState{
         //apply force for movement
         if (inputControl.isPressed(inputControl.RIGHT) && vel.x < MAXSPEED) {
             if (cl.isCharContact()) {
-                charBod.applyLinearImpulse(ACC, 0f, pos.x, pos.y, true);
+                charBod.applyLinearImpulse(ACC * delta, 0f, pos.x, pos.y, true);
             } else {
-                charBod.applyLinearImpulse(ACC/2, 0f, pos.x, pos.y, true);
+                charBod.applyLinearImpulse(ACC/2 * delta, 0f, pos.x, pos.y, true);
             }
         }
         if (inputControl.isPressed(inputControl.LEFT) && vel.x > -MAXSPEED) {
             if (cl.isCharContact()) {
-                charBod.applyLinearImpulse(-ACC, 0f, pos.x, pos.y, true);
+                charBod.applyLinearImpulse(-ACC * delta, 0f, pos.x, pos.y, true);
             } else {
-                charBod.applyLinearImpulse(-ACC/2, 0f, pos.x, pos.y, true);
+                charBod.applyLinearImpulse(-ACC/2 * delta, 0f, pos.x, pos.y, true);
             }
         }
 
         //stop movement - better than friction
         if (!inputControl.isPressed(inputControl.LEFT) && !inputControl.isPressed(inputControl.RIGHT)) {
-            charBod.applyLinearImpulse(-(vel.x / 4), 0f, pos.x, pos.y, true);
+            charBod.applyLinearImpulse(-(vel.x * ACC * 3 * delta), 0f, pos.x, pos.y, true);
         }
     }
 
@@ -174,9 +227,12 @@ public class play extends gameState{
 
     public void update(float delta) {
 
-        handleInput();
+        handleInput(delta);
 
         boxWorld.step(delta, 6, 2);
+        rayHandler.update();
+        wrldLights.update();
+        frtLight.update();
         cameraMovement();
 
         //remove obejcts after world has finished updating
@@ -204,8 +260,23 @@ public class play extends gameState{
 
         mapControl.renderBack(batch);
         mapControl.renderMain(batch);
+
+        lightRenderPos = mainCam.combined.cpy();
+        rayHandler.setCombinedMatrix(lightRenderPos.scl(PPM));
+        wrldLights.setCombinedMatrix(lightRenderPos);
+        //wrldLight.setPosition((bottomLeftViewPoint.x + cWIDTH / 2f) / PPM, (bottomLeftViewPoint.y + cHEIGHT) / PPM);
+
+        //rayHandler.render();
+
         myChar.render(batch, Color.WHITE);
+        wrldLights.render();
+
         mapControl.renderFront(batch);
+        //frtLight.render();
+
+        Texture lightMap = wrldLights.getLightMapTexture();
+
+
 
         //For debugging box2D stuff.
         if (DEBUG) {
@@ -223,7 +294,7 @@ public class play extends gameState{
 
     private void createChunks() {
         if (lOffset != cOffset) {
-            System.out.println(cOffset);
+            System.out.println("Chunk: " + cOffset);
             lOffset = cOffset;
         }
 
@@ -329,7 +400,11 @@ public class play extends gameState{
         }
     }
 
-    public  void dispose() {}
+    public  void dispose() {
+        rayHandler.dispose();
+        bdRen.dispose();
+        boxWorld.dispose();
+    }
 
     public static Vector2 getBottomLeftViewPoint() {
         return bottomLeftViewPoint;

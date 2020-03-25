@@ -76,13 +76,14 @@ public class mainGame extends ApplicationAdapter {
 	@Override
 	public void render() {
 
+		GSH.render();
 		elapsedTime += Gdx.graphics.getDeltaTime();
 		while (elapsedTime >= TICK) {
 			GSH.update(TICK);
 			inputControl.update();
 			elapsedTime -= TICK;
 		}
-		GSH.render();
+
 	}
 
 	@Override

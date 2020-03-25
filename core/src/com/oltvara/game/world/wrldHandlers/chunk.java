@@ -118,13 +118,18 @@ public class chunk {
                 yFlip = 1;
 
                 int groundTex;
+                float rand = (float)fct.random();
 
-                if (fct.random() > 0.06) {
+                if (rand > 0.08) {
                     groundTex = frTex.GROUND;
                     xFlip = new Random().nextBoolean() ? -1 : 1;
                     yFlip = new Random().nextBoolean() ? -1 : 1;
                 } else {
-                    groundTex = frTex.ROCKS;
+                    if (rand < 0.002) {
+                        groundTex = frTex.SPECIALGROUND;
+                    } else {
+                        groundTex = frTex.ROCKS;
+                    }
                 }
 
                 tl.updateTexture(pickTx(groundTex), xFlip, yFlip);
@@ -149,7 +154,7 @@ public class chunk {
 
     private TextureRegion pickTx(Integer texList) {
         String[] names = frTex.getTileList(texList);
-        int txPick = (int)fct.random(0, names.length - 1);
+        int txPick = (int)fct.random(0, names.length);
 
         return frTex.getTileTex(names[txPick]);
     }

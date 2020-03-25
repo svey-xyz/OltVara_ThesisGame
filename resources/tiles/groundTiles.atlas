@@ -81,16 +81,37 @@ groundRockSpeckle-1-1
   orig: 16, 16
   offset: 0, 0
   index: -1
-groundSpeckle-1-1
+groundSpecial-1-1
   rotate: false
   xy: 42, 62
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
   index: -1
-groundSpeckle-1-2
+groundSpecial-1-2
   rotate: false
   xy: 2, 2
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+groundSpecial-1-3
+  rotate: false
+  xy: 22, 22
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+groundSpeckle-1-1
+  rotate: false
+  xy: 42, 42
+  size: 16, 16
+  orig: 16, 16
+  offset: 0, 0
+  index: -1
+groundSpeckle-1-2
+  rotate: false
+  xy: 22, 2
   size: 16, 16
   orig: 16, 16
   offset: 0, 0
