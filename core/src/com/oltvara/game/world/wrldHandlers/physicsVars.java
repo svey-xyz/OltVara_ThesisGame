@@ -8,4 +8,6 @@ public class physicsVars {
     //only use bits! categories are based on bits, odd numbers result in multiple category definitions
     public  static final short bitCHAR = 2;
     public static final short bitGROUND = 4;
+    public static final short bitTREE = 8;
+    public static final short bitLIGHT = 16;
 }

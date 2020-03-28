@@ -43,13 +43,13 @@ public class bush {
     }
 
     public void render(SpriteBatch sb) {
-        for (int i = 0; i < leaves.size(); i++) {
+        for (int i = leaves.size() - 1; i >= 0; i--) {
             leaves.get(i).render(sb, leaves.get(i).getCol());
         }
     }
 
     public void update(float dt) {
-        for (int i = 0; i < leaves.size(); i++) {
+        for (int i = leaves.size() - 1; i >= 0; i--) {
             leaves.get(i).update(dt);
         }
     }

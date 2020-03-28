@@ -41,14 +41,12 @@ public class sprite {
     }
 
     public void render(SpriteBatch sb, Color tint) {
-        sb.begin();
         sb.setColor(tint);
         sb.draw(
                 anim.getFrame(),
                 (pos.x * physicsVars.PPM - width / 2),
                 (pos.y * physicsVars.PPM - height / 2)
         );
-        sb.end();
     }
 
     public Body getBod() { return body; }

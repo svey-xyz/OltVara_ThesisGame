@@ -6,10 +6,15 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.oltvara.game.gamestates.play;
 import com.oltvara.game.world.wrldHandlers.chunk;
+
 import java.util.HashMap;
 
 
 public class map {
+
+    public final int RENDERMAIN = 0;
+    public final int RENDERFRONT = 1;
+    public final int RENDERBACK = -1;
 
     private HashMap<Integer, chunk> chunks;
 
@@ -81,21 +86,20 @@ public class map {
         chunks.remove(offset);
     }
 
-    public void renderBack(SpriteBatch sb) {
-        for(chunk ch : chunks.values()){
-            ch.renderBack(sb);
-        }
-    }
 
-    public void renderMain(SpriteBatch sb) {
-        for(chunk ch : chunks.values()){
-            ch.renderTiles(sb);
-        }
-    }
-
-    public void renderFront(SpriteBatch sb) {
-        for(chunk ch : chunks.values()){
-            ch.renderFront(sb);
+    public void render(SpriteBatch sb, int renderLayer) {
+        if (renderLayer == RENDERMAIN) {
+            for (chunk ch : chunks.values()) {
+                ch.renderMain(sb);
+            }
+        } else if (renderLayer == RENDERBACK) {
+            for(chunk ch : chunks.values()){
+                ch.renderBack(sb);
+            }
+        } else if (renderLayer == RENDERFRONT) {
+            for(chunk ch : chunks.values()){
+                ch.renderFront(sb);
+            }
         }
     }
 

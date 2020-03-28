@@ -5,12 +5,12 @@ import static com.oltvara.game.mainGame.TILESIZE;
 import static com.oltvara.game.world.wrldHandlers.physicsVars.PPM;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.oltvara.game.world.wrldHandlers.physicsVars;
 
 import java.util.ArrayList;
 
@@ -20,14 +20,18 @@ public class tree {
     private ArrayList<leafLayer> leaves, backLeaves;
     private Color leafCol, trunkCol;
     private Vector2 relPOS, renPOS;
-    private int size;
+    private int size, shadowSize;
     private TextureRegion trunkTex;
     private boolean hasLeaves, hasBackLeaves;
 
+    Texture shadow;
+    Vector2 trOffset;
+
     public tree(Vector2 pos, int chunkOffset, int treeType) {
+
         float sDColMod = (float)fct.random() + 1;
 
-        Vector2 trOffset = frTex.getPosOffset(frTex.TREE, treeType);
+        trOffset = frTex.getPosOffset(frTex.TREE, treeType);
         float lfSDCol = frTex.getLfSDCol(frTex.TREE, treeType) / sDColMod;
         float trSDCol = frTex.getTrSDCol(treeType) / sDColMod;
         String txName = frTex.pickTx(frTex.TREE, treeType);
@@ -53,6 +57,15 @@ public class tree {
         backLeaves = new ArrayList<>();
 
         size = trunkTex.getRegionWidth();
+
+        if (size == 128) {
+            shadow = frTex.getTreeShadow("smallShadow");
+        } else {
+            shadow = frTex.getTreeShadow("mediumShadow");
+        }
+
+        shadowSize = shadow.getWidth();
+
 
         relPOS = new Vector2();
         relPOS.x = (pos.x + 0.5f + chunkOffset) * TILESIZE / PPM + trOffset.x;
@@ -84,29 +97,28 @@ public class tree {
     }
 
     public void render(SpriteBatch sb) {
-        for (int i = 0; i < backLeaves.size(); i++) {
-            backLeaves.get(i).render(sb, backLeaves.get(i).getCol());
+        for (int i = leaves.size() - 1; i >= 0; i--) {
+            leaves.get(i).render(sb, leaves.get(i).getCol());
         }
 
-
-        sb.begin();
         sb.setColor(trunkCol);
-        sb.draw(trunkTex,
-                (relPOS.x * physicsVars.PPM - size / 2f),
-                (relPOS.y * physicsVars.PPM - size / 2f)
-        );
-        sb.end();
+        sb.draw(trunkTex, renPOS.x, renPOS.y);
 
-        for (int i = 0; i < leaves.size(); i++) {
-            leaves.get(i).render(sb, leaves.get(i).getCol());
+        sb.draw(shadow,
+                (relPOS.x * PPM - shadowSize / 2f),
+                ((relPOS.y - trOffset.y) * PPM - shadowSize + TILESIZE / 2f)
+        );
+
+        for (int i = backLeaves.size() - 1; i >= 0; i--) {
+            backLeaves.get(i).render(sb, backLeaves.get(i).getCol());
         }
     }
 
     public void update(float dt) {
-        for (int i = 0; i < leaves.size(); i++) {
+        for (int i = leaves.size() - 1; i >= 0; i--) {
             leaves.get(i).update(dt);
         }
-        for (int i = 0; i < backLeaves.size(); i++) {
+        for (int i = backLeaves.size() - 1; i >= 0; i--) {
             backLeaves.get(i).update(dt);
         }
     }

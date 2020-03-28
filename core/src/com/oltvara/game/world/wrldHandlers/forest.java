@@ -122,29 +122,33 @@ public class forest {
 
     //Rendering layers
     //Use the inFrame function to make render calls only for object on screen
-    void renderFront(SpriteBatch sb) {
-        for (int i = rocks.size() - 1; i >= 0; i--) {
-            if (chunk.inFrame(rocks.get(i).getRenPOS(), rocks.get(i).getSize())) {
-                renderRock(sb, rocks.get(i).getTX(), rocks.get(i).getRenPOS(), Color.WHITE);
-                if (rocks.get(i).getMossTX() != null) renderRock(sb, rocks.get(i).getMossTX(), rocks.get(i).getRenPOS(), rocks.get(i).getMossCol());
+    void renderFrontTrees(SpriteBatch sb) {
+        for (int i = trees.size() - 1; i >= 0; i--) {
+            if (chunk.inFrame(trees.get(i).getRenPOS(), trees.get(i).getSize())) {
+                trees.get(i).render(sb);
             }
         }
+    }
+
+    void renderFrontFoliage(SpriteBatch sb) {
         for (int i = bushes.size() - 1; i >= 0; i--) {
             if (chunk.inFrame(bushes.get(i).getRenPOS(), bushes.get(i).getSize())) {
                 bushes.get(i).render(sb);
             }
         }
-        for (int i = trees.size() - 1; i >= 0; i--) {
-            if (chunk.inFrame(trees.get(i).getRenPOS(), trees.get(i).getSize())) {
-                trees.get(i).render(sb);
+        for (int i = rocks.size() - 1; i >= 0; i--) {
+            if (chunk.inFrame(rocks.get(i).getRenPOS(), rocks.get(i).getSize())) {
+                renderRock(sb, rocks.get(i).getTX(), rocks.get(i).getRenPOS(), Color.WHITE);
+                if (rocks.get(i).getMossTX() != null) renderRock(sb, rocks.get(i).getMossTX(), rocks.get(i).getRenPOS(), rocks.get(i).getMossCol());
             }
         }
     }
 
     void renderBack(SpriteBatch sb) {
-        for (int i = trees.size() - 1; i >= 0; i--) {
-            if (chunk.inFrame(trees.get(i).getRenPOS(), trees.get(i).getSize())) {
-                trees.get(i).render(sb);
+        for (int i = rocks.size() - 1; i >= 0; i--) {
+            if (chunk.inFrame(rocks.get(i).getRenPOS(), rocks.get(i).getSize())) {
+                renderRock(sb, rocks.get(i).getTX(), rocks.get(i).getRenPOS(), Color.WHITE);
+                if (rocks.get(i).getMossTX() != null) renderRock(sb, rocks.get(i).getMossTX(), rocks.get(i).getRenPOS(), rocks.get(i).getMossCol());
             }
         }
         for (int i = bushes.size() - 1; i >= 0; i--) {
@@ -152,19 +156,16 @@ public class forest {
                 bushes.get(i).render(sb);
             }
         }
-        for (int i = rocks.size() - 1; i >= 0; i--) {
-            if (chunk.inFrame(rocks.get(i).getRenPOS(), rocks.get(i).getSize())) {
-                renderRock(sb, rocks.get(i).getTX(), rocks.get(i).getRenPOS(), Color.WHITE);
-                if (rocks.get(i).getMossTX() != null) renderRock(sb, rocks.get(i).getMossTX(), rocks.get(i).getRenPOS(), rocks.get(i).getMossCol());
+        for (int i = trees.size() - 1; i >= 0; i--) {
+            if (chunk.inFrame(trees.get(i).getRenPOS(), trees.get(i).getSize())) {
+                trees.get(i).render(sb);
             }
         }
     }
 
     private void renderRock(SpriteBatch sb, TextureRegion tx, Vector2 pos, Color col) {
-        sb.begin();
         sb.setColor(col);
         sb.draw(tx, pos.x, pos.y);
-        sb.end();
     }
 
     public void update(float delta) {

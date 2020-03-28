@@ -212,19 +212,20 @@ public class chunk {
         forestHandlerBack.renderBack(sb);
     }
 
-    public void renderTiles(SpriteBatch sb) {
+    public void renderMain(SpriteBatch sb) {
+        forestHandlerFront.renderFrontFoliage(sb);
         for(tile tl : tiles.values()){
             if (inFrame(tl.getRelPOS(), TILESIZE)) {
-                renderTile(sb, tl.getTX(), tl.getRelPOS(), tl.getFlip());
+
                 if (tl.getGrassTX() != null) {
                     renderTile(sb, tl.getGrassTX(), tl.getRelPOS(), std);
                 }
+                renderTile(sb, tl.getTX(), tl.getRelPOS(), tl.getFlip());
             }
         }
     }
 
     private void renderTile(SpriteBatch sb, TextureRegion tx, Vector2 pos, Vector2 flip) {
-        sb.begin();
         sb.setColor(Color.WHITE);
         sb.draw(
                 tx,
@@ -232,11 +233,10 @@ public class chunk {
                 pos.y,
                 8, 8, 16, 16, flip.x, flip.y, 0
         );
-        sb.end();
     }
 
     public void renderFront(SpriteBatch sb) {
-        forestHandlerFront.renderFront(sb);
+        forestHandlerFront.renderFrontTrees(sb);
     }
 
     public ConcurrentHashMap<Vector2, tile> getTileMap() {

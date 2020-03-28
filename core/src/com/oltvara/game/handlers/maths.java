@@ -95,6 +95,10 @@ public class maths {
         return (float)Math.sqrt(Math.pow((x2 - x1), 2) + Math.pow((y2 - y1), 2));
     }
 
+    public float nearEdge(int x, int z, int CENTRE_POINT_X, int CENTRE_POINT_Y) {
+        return (float)Math.floor(distance(x, z, CENTRE_POINT_X, CENTRE_POINT_Y));
+    }
+
     public double percentDifference(double val1, double val2) {
         if (val1 > 0) {
             return (Math.abs(val1 - val2) / val1);

@@ -3,10 +3,10 @@ package com.oltvara.game.gamestates;
 import static com.oltvara.game.mainGame.*;
 import static com.oltvara.game.world.wrldHandlers.physicsVars.PPM;
 
-import box2dLight.DirectionalLight;
-import box2dLight.PointLight;
 import box2dLight.RayHandler;
 import com.badlogic.gdx.graphics.*;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -15,12 +15,12 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.oltvara.game.entities.mainChar;
+import com.oltvara.game.handlers.lightHandler;
 import com.oltvara.game.world.map;
 import com.oltvara.game.world.wrldHandlers.contactListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.oltvara.game.handlers.inputControl;
 import com.oltvara.game.world.wrldHandlers.physicsVars;
 import com.oltvara.game.handlers.stateHandler;
 import com.oltvara.game.mainGame;
@@ -30,48 +30,39 @@ public class play extends gameState{
 
     private final boolean DEBUG = false;
 
+    //rendering and world stuff
     public static World boxWorld;
     private Box2DDebugRenderer bdRen;
     private Vector3 targetPos;
+    private boolean movingY;
     private final float CAMSPEEDMODIFER = 300f;
-
     private OrthographicCamera boxCam;
     private OrthogonalTiledMapRenderer tmr;
 
-    public static RayHandler rayHandler;
-    private RayHandler wrldLights, frtLight;
-    private PointLight charLight;
-    private PointLight wrldLight;
-    private DirectionalLight dL1, dL2, dL3;
-    Matrix4 lightRenderPos;
+
+    //lighting stuff
+    private ShaderProgram shadowShader;
+    private Mesh quad;
+    private RayHandler mainLights, backLights, frontLights;
+    private Matrix4 lightRenderPos;
+
+    private FrameBuffer fbo;
 
     //for random map generation
-    private static map mapControl;
+    private map mapControl;
     private float camRightPoint, camLeftPoint;
-    private int cOffset = 0, lOffset =0;
+    private int cOffset = 0, pOffset = 0;
     private int leftPointTotal, rightPointTotal;
     private static Vector2 bottomLeftViewPoint;
 
     private static Array<Body> bodiesToRemove;
 
     //Character physics stuff
-    private contactListener cl;
-    private mainChar myChar;
-    private Body charBod;
-    private final float MAXSPEED = 1.5f;
-    private final float ACC = 2f;
-    private final int JUMP = 50;
-    private final int MAXJUMPVEL = 3;
-    private Vector2 pos;
-    private boolean jumping = false;
-
-    private boolean movingY;
+    private static contactListener cl;
+    private static mainChar myChar;
 
     public play(stateHandler GSH) {
         super(GSH);
-
-        bodiesToRemove = new Array<Body>();
-        bottomLeftViewPoint = new Vector2();
 
         //setup physics stuff
         boxWorld = new World(new Vector2(0, -9.81f), true);
@@ -79,62 +70,28 @@ public class play extends gameState{
         boxWorld.setContactListener(cl);
         bdRen = new Box2DDebugRenderer();
 
+        bodiesToRemove = new Array<Body>();
+        bottomLeftViewPoint = new Vector2();
+
+        //create character
+        myChar = new mainChar(mainChar.createBody(boxWorld));
+        mainCam.position.set(new Vector3(myChar.getPosition().x * PPM, myChar.getPosition().y * PPM, mainCam.position.z));
+
+        //setup light stuff, has to be done after char creation since a light is attached to the char bod
+        lightHandler lights = new lightHandler();
+        shadowShader = lights.setupShader("shadowShader");
+
+        quad = lights.creatQuad();
+
+        frontLights = lights.getRayHandler("frontLights");
+        mainLights = lights.getRayHandler("mainLights");
+        backLights = lights.getRayHandler("backLights");
+
+        fbo = new FrameBuffer(Pixmap.Format.RGBA8888, (cWIDTH * SCALE), (cHEIGHT * SCALE), false);
+
         //setup debug Cam
         boxCam = new OrthographicCamera();
         boxCam.setToOrtho(false, mainGame.cWIDTH / PPM, mainGame.cHEIGHT / PPM);
-
-        rayHandler = new RayHandler(boxWorld);
-        rayHandler.setAmbientLight(0.5f);
-        rayHandler.setBlur(true);
-
-        wrldLights = new RayHandler(boxWorld);
-        wrldLights.setBlur(true);
-        wrldLights.resizeFBO(100, 100);
-        wrldLights.setCulling(true);
-        RayHandler.useDiffuseLight(true);
-
-        frtLight = new RayHandler(boxWorld);
-        wrldLights.setBlur(true);
-        frtLight.setAmbientLight(1f);
-
-        //static - unaffected; dynamic - affected; kinematic - unaffected but can still move
-        //create player
-        createChar();
-
-        charBod = myChar.getBod();
-        pos = charBod.getPosition();
-        mainCam.position.set(new Vector3(pos.x * PPM, pos.y * PPM, mainCam.position.z));
-
-        Filter filter = new Filter();
-        filter.categoryBits = physicsVars.bitCHAR; // Value listed below
-        filter.maskBits = physicsVars.bitGROUND;
-
-        charLight = new PointLight(rayHandler, 200, Color.WHITE, 128 / PPM, 0, 0);
-        charLight.setSoftnessLength(0.2f);
-        charLight.attachToBody(charBod);
-        charLight.setActive(true);
-        //charLight.setSoft(true);
-        //charLight.setContactFilter("Sensor");
-        charLight.setIgnoreAttachedBody(true);
-        charLight.setContactFilter(filter);
-
-        dL1 = new DirectionalLight(wrldLights, 200, Color.WHITE, -91);
-        dL1.setSoftnessLength(1.5f);
-        //dL1.setSoft(true);
-        dL1.setContactFilter(filter);
-        //dL1.setPosition(0, 1000);
-
-        dL2 = new DirectionalLight(frtLight, 200, Color.WHITE, -91);
-        dL2.setSoftnessLength(1.5f);
-        //dL1.setSoft(true);
-        dL2.setContactFilter(filter);
-
-        /*wrldLight = new PointLight(rayHandler, 500, fct.fromRGB(90, 80, 80), 600 / PPM, 0, 0);
-        wrldLight.setSoftnessLength(2f);
-        //wrldLight.setXray(true);
-        wrldLight.setStaticLight(true);
-        wrldLight.setContactFilter(filter);*/
-
 
         //map generation init
         mapControl = new map(25);
@@ -142,56 +99,12 @@ public class play extends gameState{
     }
 
     public void handleInput(float delta) {
-        charBod = myChar.getBod();
-        pos = charBod.getPosition();
-        Vector2 vel = charBod.getLinearVelocity();
-
-        //set jump state
-        if (inputControl.isTap(inputControl.JUMPBUT) && cl.isCharContact()) {
-            jumping = true;
-        }
-        if (inputControl.isReleased(inputControl.JUMPBUT)) {
-            jumping = false;
-        }
-
-        //Control jump height based on length button was pressed while still allowing jump on tap not on release
-        if (inputControl.isPressed(inputControl.JUMPBUT) && jumping) {
-            if (charBod.getLinearVelocity().y < MAXJUMPVEL) {
-                int holdTime = inputControl.heldTime(inputControl.JUMPBUT);
-                float jump = JUMP * (holdTime / 5f) * delta;
-                jump = (int) fct.constrain(jump, JUMP, 200);
-
-                charBod.applyForceToCenter(0, jump, true);
-            } else {
-                jumping = false;
-            }
-        }
-
-        //apply force for movement
-        if (inputControl.isPressed(inputControl.RIGHT) && vel.x < MAXSPEED) {
-            if (cl.isCharContact()) {
-                charBod.applyLinearImpulse(ACC * delta, 0f, pos.x, pos.y, true);
-            } else {
-                charBod.applyLinearImpulse(ACC/2 * delta, 0f, pos.x, pos.y, true);
-            }
-        }
-        if (inputControl.isPressed(inputControl.LEFT) && vel.x > -MAXSPEED) {
-            if (cl.isCharContact()) {
-                charBod.applyLinearImpulse(-ACC * delta, 0f, pos.x, pos.y, true);
-            } else {
-                charBod.applyLinearImpulse(-ACC/2 * delta, 0f, pos.x, pos.y, true);
-            }
-        }
-
-        //stop movement - better than friction
-        if (!inputControl.isPressed(inputControl.LEFT) && !inputControl.isPressed(inputControl.RIGHT)) {
-            charBod.applyLinearImpulse(-(vel.x * ACC * 3 * delta), 0f, pos.x, pos.y, true);
-        }
+        myChar.charMovement(delta);
     }
 
     //Might need to apply Euler's integration to avoid weird rendering issues with de-synchronization from physics update.
     private void cameraMovement() {
-        float yDiff = Math.abs(mainCam.position.y - pos.y * PPM);
+        final float yDiff = Math.abs(mainCam.position.y - myChar.getPosition().y * PPM);
 
         //controlled Y movement - creates Mario style camera follow where camera only follows X unless yDiff is big enough
         //this is nice since the camera following every jump is annoying af
@@ -200,10 +113,10 @@ public class play extends gameState{
 
         //Set target pos based on yDiff
         if (movingY) {
-            targetPos = new Vector3(pos.x * PPM, pos.y * PPM + cHEIGHT / 6f, mainCam.position.z);
+            targetPos = new Vector3(myChar.getPosition().x * PPM, myChar.getPosition().y * PPM + cHEIGHT / 6f, mainCam.position.z);
         }
         if (!movingY) {
-            targetPos = new Vector3(pos.x * PPM, mainCam.position.y, mainCam.position.z);
+            targetPos = new Vector3(myChar.getPosition().x * PPM, mainCam.position.y, mainCam.position.z);
         }
 
         //distance between camera and character position determines lerp speed
@@ -230,9 +143,9 @@ public class play extends gameState{
         handleInput(delta);
 
         boxWorld.step(delta, 6, 2);
-        rayHandler.update();
-        wrldLights.update();
-        frtLight.update();
+        frontLights.update();
+        mainLights.update();
+        backLights.update();
         cameraMovement();
 
         //remove obejcts after world has finished updating
@@ -241,50 +154,102 @@ public class play extends gameState{
             //remove from array
             boxWorld.destroyBody(b);
         }
+
         bodiesToRemove.clear();
+
+        createChunks();
 
         mapControl.update(delta);
         myChar.update(delta);
-        createChunks();
     }
 
     public void render() {
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
-        //for drawing loaded maps
-        /*tmr.setView(mainCam);
-        tmr.render();*/
+        //set viewpoints for lights and spritebatch to camera
+        lightRenderPos = mainCam.combined.cpy().scl(PPM);
+
+        frontLights.setCombinedMatrix(lightRenderPos);
+        mainLights.setCombinedMatrix(lightRenderPos);
+        backLights.setCombinedMatrix(lightRenderPos);
 
         batch.setProjectionMatrix(mainCam.combined);
 
-        mapControl.renderBack(batch);
-        mapControl.renderMain(batch);
+        //render lights to be able to get their framebuffer
+        mainLights.render();
+        frontLights.render();
+        backLights.render();
 
-        lightRenderPos = mainCam.combined.cpy();
-        rayHandler.setCombinedMatrix(lightRenderPos.scl(PPM));
-        wrldLights.setCombinedMatrix(lightRenderPos);
-        //wrldLight.setPosition((bottomLeftViewPoint.x + cWIDTH / 2f) / PPM, (bottomLeftViewPoint.y + cHEIGHT) / PPM);
+        //for fixing weird blending from shaders
+        batch.setBlendFunction(Gdx.gl20.GL_SRC_ALPHA_SATURATE, Gdx.gl20.GL_ONE);
 
-        //rayHandler.render();
+        //draw and blend the lights to the map layers
+        blendLights(backLights.getLightMapTexture(), drawFrameBuffer(mapControl.RENDERBACK));
 
+        //draw the character inbetween layers
+        batch.setBlendFunction(Gdx.gl20.GL_SRC_ALPHA, Gdx.gl20.GL_ONE_MINUS_SRC_ALPHA);
+        batch.begin();
         myChar.render(batch, Color.WHITE);
-        wrldLights.render();
+        batch.end();
 
-        mapControl.renderFront(batch);
-        //frtLight.render();
+        batch.setBlendFunction(Gdx.gl20.GL_SRC_ALPHA_SATURATE, Gdx.gl20.GL_ONE);
+        blendLights(mainLights.getLightMapTexture(), drawFrameBuffer(mapControl.RENDERMAIN));
+        blendLights(frontLights.getLightMapTexture(), drawFrameBuffer(mapControl.RENDERFRONT));
 
-        Texture lightMap = wrldLights.getLightMapTexture();
-
-
+        //return things to normal
+        batch.setBlendFunction(Gdx.gl20.GL_SRC_ALPHA, Gdx.gl20.GL_ONE_MINUS_SRC_ALPHA);
 
         //For debugging box2D stuff.
         if (DEBUG) {
             boxCam.position.set(mainCam.position).scl(1/PPM);
             boxCam.update();
             bdRen.render(boxWorld, boxCam.combined);
-
         }
+    }
+
+    private Texture drawFrameBuffer(int renderLayer) {
+        //draw the map layer to a frame buffer
+        fbo.begin();
+        {
+            Gdx.gl.glClearColor(0, 0, 0, 0);
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+            batch.enableBlending();
+            batch.begin();
+            mapControl.render(batch, renderLayer);
+            batch.end();
+        }
+        fbo.end();
+
+        return fbo.getColorBufferTexture();
+    }
+
+    private void blendLights(Texture tex0, Texture tex1) {
+        //bind the lightmap texture
+        Gdx.gl20.glActiveTexture(GL20.GL_TEXTURE0);
+        tex0.bind();
+
+        //bind the level texture
+        Gdx.gl20.glActiveTexture(GL20.GL_TEXTURE1);
+        tex1.bind();
+
+        //blend the two textures- happens in the fragment shader
+        Gdx.gl20.glEnable(Gdx.gl20.GL_BLEND);
+        Gdx.gl20.glBlendFunc(Gdx.gl20.GL_SRC_ALPHA, Gdx.gl20.GL_ONE_MINUS_SRC_ALPHA);
+
+        shadowShader.begin();
+        {
+            shadowShader.setUniformf("ambient_color", Color.WHITE);
+            shadowShader.setUniformi("u_texture0", 0);
+            shadowShader.setUniformi("u_texture1", 1);
+            quad.render(shadowShader, GL20.GL_TRIANGLE_FAN, 0, 4);
+        }
+        shadowShader.end();
+
+        //return things to normal
+        Gdx.gl20.glDisable(Gdx.gl20.GL_BLEND);
+        Gdx.gl20.glActiveTexture(GL20.GL_TEXTURE0);
     }
 
     //for queuing physics bodies to destroy from other methods.
@@ -293,9 +258,9 @@ public class play extends gameState{
     }
 
     private void createChunks() {
-        if (lOffset != cOffset) {
+        if (pOffset != cOffset) {
             System.out.println("Chunk: " + cOffset);
-            lOffset = cOffset;
+            pOffset = cOffset;
         }
 
         //Figure out camera viewport compared to world units and furthest points of world in chunk
@@ -326,36 +291,6 @@ public class play extends gameState{
         if (camLeftPoint < leftPointTotal + (TILESIZE * tileBUFFER / 2f) && !mapControl.hasChunk(cOffset - 1)) {
             mapControl.addChunk(cOffset - 1);
         }
-    }
-
-    //create main character
-    private void createChar() {
-        BodyDef defBod = new BodyDef();
-        PolygonShape box = new PolygonShape();
-        FixtureDef defFix = new FixtureDef();
-
-        //create main Character
-        defBod.position.set(0, 1000 / PPM);
-        defBod.type = BodyDef.BodyType.DynamicBody;
-        Body body= boxWorld.createBody(defBod);
-
-        box.setAsBox(7 / PPM,30.5f / PPM);
-        defFix.shape = box;
-        defFix.filter.categoryBits = physicsVars.bitCHAR;
-        defFix.filter.maskBits = physicsVars.bitGROUND;
-        //defFix.restitution = 0.8f;
-        body.createFixture(defFix).setUserData("mainChar");
-
-        //create foot sensor
-        box.setAsBox(6 / PPM, 0.5f / PPM, new Vector2(0.25f / PPM, -30 / PPM), 0);
-        defFix.shape = box;
-        defFix.filter.categoryBits = physicsVars.bitCHAR;
-        defFix.filter.maskBits = physicsVars.bitGROUND;
-        defFix.isSensor = true;
-        body.createFixture(defFix).setUserData("sensor");
-
-        body.setUserData(myChar);
-        myChar = new mainChar(body);
     }
 
     //for loading pre-made maps
@@ -401,7 +336,7 @@ public class play extends gameState{
     }
 
     public  void dispose() {
-        rayHandler.dispose();
+        frontLights.dispose();
         bdRen.dispose();
         boxWorld.dispose();
     }
@@ -412,5 +347,13 @@ public class play extends gameState{
 
     public static Vector2 getViewporSize() {
         return new Vector2(1, 1);
+    }
+
+    public static mainChar getChar() {
+        return myChar;
+    }
+
+    public static contactListener getCL() {
+        return cl;
     }
 }

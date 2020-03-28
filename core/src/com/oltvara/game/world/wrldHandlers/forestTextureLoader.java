@@ -2,6 +2,8 @@ package com.oltvara.game.world.wrldHandlers;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
@@ -53,6 +55,7 @@ public class forestTextureLoader {
 
     private HashMap<String, ArrayList<Array<TextureAtlas.AtlasRegion>>> leafTextures;
     private HashMap<String, TextureRegion> trunks;
+    private HashMap<String, Texture> treeShadows;
 
     private HashMap<String, ArrayList<Array<TextureAtlas.AtlasRegion>>> bushTextures;
 
@@ -67,6 +70,7 @@ public class forestTextureLoader {
 
         leafTextures = new HashMap<>();
         trunks = new HashMap<>();
+        treeShadows = new HashMap<>();
 
         bushTextures = new HashMap<>();
 
@@ -90,6 +94,9 @@ public class forestTextureLoader {
                 loadBushTextures(bsName);
             }
         }
+
+        treeShadows.put("mediumShadow", createTreeShadow(3 * TILESIZE));
+        treeShadows.put("smallShadow", createTreeShadow(2* TILESIZE));
     }
 
     /*bush texture loading is different than tree so that multiple bushes can be stored in one texture pack to decrease
@@ -157,6 +164,10 @@ public class forestTextureLoader {
         return trunks.get(treeName);
     }
 
+    public Texture getTreeShadow(String name) {
+        return treeShadows.get(name);
+    }
+
     public Color getLeafCols(int plantType, int texType) {
         if (plantType == TREE) return treeTypes.get(texType).getLeafColor();
         if (plantType == BUSH) return bushTypes.get(texType).getLeafColor();
@@ -220,6 +231,31 @@ public class forestTextureLoader {
         leafTextures.clear();
         bushTextures.clear();
         trunks.clear();
+    }
+
+    private Texture createTreeShadow(int shadowSize) {
+        Pixmap px = new Pixmap(shadowSize, shadowSize, Pixmap.Format.RGBA8888);
+        px.setColor(Color.RED);
+
+        //make a gradient half circle
+        for (int x = 0; x < px.getWidth(); x++) {
+            for (int y = 0; y < px.getHeight(); y++) {
+                //oapcity is determined based on distance to edge and mapped to 0 - 1
+                double val = fct.nearEdge(x, y, shadowSize / 2, 0);
+                val = fct.map(val, 0, shadowSize / 1.5f, 1, 0);
+
+                //make it a little darker
+                val *= 1.2;
+
+                //constrain to opacity vals
+                val = fct.constrain(val, 0, 1);
+
+                //draw pixel
+                px.setColor(0, 0, 0, (float)val);
+                px.drawPixel(x, y);
+            }
+        }
+        return new Texture(px);
     }
 
     private void createTreeTypes() {
