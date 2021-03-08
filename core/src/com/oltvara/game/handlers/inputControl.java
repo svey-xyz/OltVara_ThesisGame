@@ -46,5 +46,4 @@ public class inputControl {
     public static boolean isTap(int i) {
         return keys[i] && !prevKeys[i];
     }
-
 }

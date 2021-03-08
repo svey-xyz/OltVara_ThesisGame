@@ -1,0 +1,23 @@
+package com.oltvara.game.handlers.texture;
+
+public enum texTypesNames {
+    SMALLBUSHYTREE,
+    MEDIUMBUSHYTREE,
+    MEDIUMSPIKYTREE,
+    SMALLSPIKYTREE,
+    COLOURFULTREE,
+
+    MEDIUMBUSH,
+    SMALLBUSH,
+    LARGEBUSH,
+
+    GROUND,
+    LIVEGROUND,
+    DOUBLELIVEGROUND,
+    ROCKS,
+    TOPPER,
+    SPECIALGROUND,
+
+    SMALLROCK,
+    SMALLROCKMOSS
+}

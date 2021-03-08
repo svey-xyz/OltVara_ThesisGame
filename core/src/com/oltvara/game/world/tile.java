@@ -3,10 +3,10 @@ package com.oltvara.game.world;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.oltvara.game.world.wrldHandlers.physicsVars;
+import com.oltvara.game.handlers.physicsVars;
 
 import static com.oltvara.game.mainGame.*;
-import static com.oltvara.game.world.wrldHandlers.physicsVars.PPM;
+import static com.oltvara.game.handlers.physicsVars.PPM;
 
 public class tile {
 

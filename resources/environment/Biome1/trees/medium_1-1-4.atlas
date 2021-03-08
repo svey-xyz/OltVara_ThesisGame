@@ -1,0 +1,1375 @@
+
+medium_1-1-4.png
+size: 2048,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+layer0
+  rotate: false
+  xy: 0, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer0
+  rotate: false
+  xy: 0, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer0
+  rotate: false
+  xy: 256, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer0
+  rotate: false
+  xy: 0, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer0
+  rotate: false
+  xy: 256, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer0
+  rotate: false
+  xy: 512, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer0
+  rotate: false
+  xy: 0, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer0
+  rotate: false
+  xy: 256, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer0
+  rotate: false
+  xy: 512, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer0
+  rotate: false
+  xy: 768, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer0
+  rotate: false
+  xy: 0, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer0
+  rotate: false
+  xy: 256, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer10
+  rotate: false
+  xy: 512, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer10
+  rotate: false
+  xy: 768, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer10
+  rotate: false
+  xy: 1024, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer10
+  rotate: false
+  xy: 0, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer10
+  rotate: false
+  xy: 256, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer10
+  rotate: false
+  xy: 512, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer10
+  rotate: false
+  xy: 768, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer10
+  rotate: false
+  xy: 1024, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer10
+  rotate: false
+  xy: 1280, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer10
+  rotate: false
+  xy: 0, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer10
+  rotate: false
+  xy: 0, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer10
+  rotate: false
+  xy: 256, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer11
+  rotate: false
+  xy: 512, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer11
+  rotate: false
+  xy: 768, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer11
+  rotate: false
+  xy: 1024, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer11
+  rotate: false
+  xy: 1280, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer11
+  rotate: false
+  xy: 1536, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer11
+  rotate: false
+  xy: 1792, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer11
+  rotate: false
+  xy: 256, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer11
+  rotate: false
+  xy: 256, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer11
+  rotate: false
+  xy: 512, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer11
+  rotate: false
+  xy: 768, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer11
+  rotate: false
+  xy: 1024, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer11
+  rotate: false
+  xy: 1280, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer12
+  rotate: false
+  xy: 1536, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer12
+  rotate: false
+  xy: 1792, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer12
+  rotate: false
+  xy: 512, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer12
+  rotate: false
+  xy: 512, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer12
+  rotate: false
+  xy: 768, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer12
+  rotate: false
+  xy: 1024, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer12
+  rotate: false
+  xy: 1280, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer12
+  rotate: false
+  xy: 1536, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer12
+  rotate: false
+  xy: 1792, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer12
+  rotate: false
+  xy: 768, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer12
+  rotate: false
+  xy: 768, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer12
+  rotate: false
+  xy: 1024, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer13
+  rotate: false
+  xy: 1280, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer13
+  rotate: false
+  xy: 1536, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer13
+  rotate: false
+  xy: 1792, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer13
+  rotate: false
+  xy: 1024, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer13
+  rotate: false
+  xy: 1024, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer13
+  rotate: false
+  xy: 1280, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer13
+  rotate: false
+  xy: 1536, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer13
+  rotate: false
+  xy: 1792, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer13
+  rotate: false
+  xy: 1280, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer13
+  rotate: false
+  xy: 1280, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer13
+  rotate: false
+  xy: 1536, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer13
+  rotate: false
+  xy: 1792, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer14
+  rotate: false
+  xy: 1536, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer14
+  rotate: false
+  xy: 1536, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer14
+  rotate: false
+  xy: 1792, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer14
+  rotate: false
+  xy: 1792, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+
+medium_1-1-42.png
+size: 2048,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+layer1
+  rotate: false
+  xy: 1280, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer1
+  rotate: false
+  xy: 0, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer1
+  rotate: false
+  xy: 0, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer1
+  rotate: false
+  xy: 256, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer1
+  rotate: false
+  xy: 512, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer1
+  rotate: false
+  xy: 768, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer1
+  rotate: false
+  xy: 1024, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer1
+  rotate: false
+  xy: 1280, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer1
+  rotate: false
+  xy: 1536, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer1
+  rotate: false
+  xy: 1792, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer1
+  rotate: false
+  xy: 256, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer1
+  rotate: false
+  xy: 256, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer14
+  rotate: false
+  xy: 0, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer14
+  rotate: false
+  xy: 0, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer14
+  rotate: false
+  xy: 256, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer14
+  rotate: false
+  xy: 0, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer14
+  rotate: false
+  xy: 256, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer14
+  rotate: false
+  xy: 512, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer14
+  rotate: false
+  xy: 0, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer14
+  rotate: false
+  xy: 256, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer15
+  rotate: false
+  xy: 512, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer15
+  rotate: false
+  xy: 768, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer15
+  rotate: false
+  xy: 0, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer15
+  rotate: false
+  xy: 256, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer15
+  rotate: false
+  xy: 512, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer15
+  rotate: false
+  xy: 768, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer15
+  rotate: false
+  xy: 1024, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer15
+  rotate: false
+  xy: 0, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer15
+  rotate: false
+  xy: 256, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer15
+  rotate: false
+  xy: 512, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer15
+  rotate: false
+  xy: 768, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer15
+  rotate: false
+  xy: 1024, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer2
+  rotate: false
+  xy: 512, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer2
+  rotate: false
+  xy: 768, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer2
+  rotate: false
+  xy: 1024, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer2
+  rotate: false
+  xy: 1280, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer2
+  rotate: false
+  xy: 1536, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer2
+  rotate: false
+  xy: 1792, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer2
+  rotate: false
+  xy: 512, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer2
+  rotate: false
+  xy: 512, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer2
+  rotate: false
+  xy: 768, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer2
+  rotate: false
+  xy: 1024, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer2
+  rotate: false
+  xy: 1280, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer2
+  rotate: false
+  xy: 1536, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer3
+  rotate: false
+  xy: 1792, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer3
+  rotate: false
+  xy: 768, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer3
+  rotate: false
+  xy: 768, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer3
+  rotate: false
+  xy: 1024, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer3
+  rotate: false
+  xy: 1280, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer3
+  rotate: false
+  xy: 1536, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer3
+  rotate: false
+  xy: 1792, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer3
+  rotate: false
+  xy: 1024, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer3
+  rotate: false
+  xy: 1024, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer3
+  rotate: false
+  xy: 1280, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer3
+  rotate: false
+  xy: 1536, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer3
+  rotate: false
+  xy: 1792, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer4
+  rotate: false
+  xy: 1280, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer4
+  rotate: false
+  xy: 1280, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer4
+  rotate: false
+  xy: 1536, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer4
+  rotate: false
+  xy: 1792, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer4
+  rotate: false
+  xy: 1536, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer4
+  rotate: false
+  xy: 1536, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer4
+  rotate: false
+  xy: 1792, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer4
+  rotate: false
+  xy: 1792, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+
+medium_1-1-43.png
+size: 2048,2048
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+layer4
+  rotate: false
+  xy: 0, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer4
+  rotate: false
+  xy: 0, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer4
+  rotate: false
+  xy: 256, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer4
+  rotate: false
+  xy: 0, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer5
+  rotate: false
+  xy: 256, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer5
+  rotate: false
+  xy: 512, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer5
+  rotate: false
+  xy: 0, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer5
+  rotate: false
+  xy: 256, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer5
+  rotate: false
+  xy: 512, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer5
+  rotate: false
+  xy: 768, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer5
+  rotate: false
+  xy: 0, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer5
+  rotate: false
+  xy: 256, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer5
+  rotate: false
+  xy: 512, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer5
+  rotate: false
+  xy: 768, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer5
+  rotate: false
+  xy: 1024, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer5
+  rotate: false
+  xy: 0, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer6
+  rotate: false
+  xy: 256, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer6
+  rotate: false
+  xy: 512, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer6
+  rotate: false
+  xy: 768, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer6
+  rotate: false
+  xy: 1024, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer6
+  rotate: false
+  xy: 1280, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer6
+  rotate: false
+  xy: 0, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer6
+  rotate: false
+  xy: 0, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer6
+  rotate: false
+  xy: 256, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer6
+  rotate: false
+  xy: 512, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer6
+  rotate: false
+  xy: 768, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer6
+  rotate: false
+  xy: 1024, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer6
+  rotate: false
+  xy: 1280, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer7
+  rotate: false
+  xy: 1536, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer7
+  rotate: false
+  xy: 1792, 1792
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer7
+  rotate: false
+  xy: 256, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer7
+  rotate: false
+  xy: 256, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer7
+  rotate: false
+  xy: 512, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer7
+  rotate: false
+  xy: 768, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer7
+  rotate: false
+  xy: 1024, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer7
+  rotate: false
+  xy: 1280, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer7
+  rotate: false
+  xy: 1536, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer7
+  rotate: false
+  xy: 1792, 1536
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer7
+  rotate: false
+  xy: 512, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer7
+  rotate: false
+  xy: 512, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer8
+  rotate: false
+  xy: 768, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer8
+  rotate: false
+  xy: 1024, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer8
+  rotate: false
+  xy: 1280, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer8
+  rotate: false
+  xy: 1536, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer8
+  rotate: false
+  xy: 1792, 1280
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer8
+  rotate: false
+  xy: 768, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer8
+  rotate: false
+  xy: 768, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer8
+  rotate: false
+  xy: 1024, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer8
+  rotate: false
+  xy: 1280, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer8
+  rotate: false
+  xy: 1536, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer8
+  rotate: false
+  xy: 1792, 1024
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer8
+  rotate: false
+  xy: 1024, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+layer9
+  rotate: false
+  xy: 1024, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 0
+layer9
+  rotate: false
+  xy: 1280, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 1
+layer9
+  rotate: false
+  xy: 1536, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 2
+layer9
+  rotate: false
+  xy: 1792, 768
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 3
+layer9
+  rotate: false
+  xy: 1280, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 4
+layer9
+  rotate: false
+  xy: 1280, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 5
+layer9
+  rotate: false
+  xy: 1536, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 6
+layer9
+  rotate: false
+  xy: 1792, 512
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 7
+layer9
+  rotate: false
+  xy: 1536, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 8
+layer9
+  rotate: false
+  xy: 1536, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 9
+layer9
+  rotate: false
+  xy: 1792, 256
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 10
+layer9
+  rotate: false
+  xy: 1792, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: 11
+
+medium_1-1-44.png
+size: 256,256
+format: RGBA8888
+filter: Nearest,Nearest
+repeat: none
+trunk
+  rotate: false
+  xy: 0, 0
+  size: 256, 256
+  orig: 256, 256
+  offset: 0, 0
+  index: -1

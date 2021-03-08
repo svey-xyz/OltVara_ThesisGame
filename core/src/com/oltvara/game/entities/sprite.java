@@ -6,15 +6,23 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.oltvara.game.handlers.animate;
-import com.oltvara.game.world.wrldHandlers.physicsVars;
+import com.oltvara.game.handlers.physicsVars;
 
 public class sprite {
 
     protected Body body;
     protected Vector2 pos;
+    protected Vector2 offset = new Vector2(0, 0);
     protected animate anim;
 
     protected float width, height;
+
+    public sprite(Body body, Vector2 offset) {
+        this.body = body;
+        this.pos = body.getPosition();
+        this.offset = offset;
+        anim = new animate();
+    }
 
     public sprite(Body body) {
         this.body = body;
@@ -44,8 +52,8 @@ public class sprite {
         sb.setColor(tint);
         sb.draw(
                 anim.getFrame(),
-                (pos.x * physicsVars.PPM - width / 2),
-                (pos.y * physicsVars.PPM - height / 2)
+                (pos.x * physicsVars.PPM - width / 2 + offset.x),
+                (pos.y * physicsVars.PPM - height / 2 + offset.y)
         );
     }
 
@@ -53,5 +61,7 @@ public class sprite {
     public Vector2 getPosition() { return pos; }
     public float getWidth() { return width; }
     public float getHeight() { return height; }
+    public int getLoopsNum() { return anim.getLoopsNum(); }
+    public void setLoopsNum(int loops) { anim.setLoops(loops); }
 
 }

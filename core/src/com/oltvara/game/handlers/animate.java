@@ -42,6 +42,9 @@ public class animate {
         cFrame++;
         if (cFrame == frames.length) {
             cFrame = 0;
+        }
+        //loops is updated before cFrame is reset to avoid rendering first frame a second time
+        if (cFrame == frames.length - 1) {
             loops++;
         }
     }
@@ -49,6 +52,9 @@ public class animate {
     public TextureRegion getFrame() {
         return frames[cFrame];
     }
+    public int getFrameNum() { return cFrame; }
 
     public int getLoopsNum() { return loops; }
+
+    public void setLoops(int num) { this.loops = num; }
 }

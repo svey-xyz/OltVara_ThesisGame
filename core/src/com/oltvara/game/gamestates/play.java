@@ -1,12 +1,11 @@
 package com.oltvara.game.gamestates;
 
 import static com.oltvara.game.mainGame.*;
-import static com.oltvara.game.world.wrldHandlers.physicsVars.PPM;
+import static com.oltvara.game.handlers.physicsVars.PPM;
 
 import box2dLight.RayHandler;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
@@ -17,14 +16,13 @@ import com.badlogic.gdx.utils.Array;
 import com.oltvara.game.entities.mainChar;
 import com.oltvara.game.handlers.lightHandler;
 import com.oltvara.game.world.map;
-import com.oltvara.game.world.wrldHandlers.contactListener;
+import com.oltvara.game.handlers.contactListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
-import com.oltvara.game.world.wrldHandlers.physicsVars;
+import com.oltvara.game.handlers.physicsVars;
 import com.oltvara.game.handlers.stateHandler;
 import com.oltvara.game.mainGame;
-
 
 public class play extends gameState{
 
@@ -39,14 +37,13 @@ public class play extends gameState{
     private OrthographicCamera boxCam;
     private OrthogonalTiledMapRenderer tmr;
 
-
     //lighting stuff
-    private ShaderProgram shadowShader;
-    private Mesh quad;
-    private RayHandler mainLights, backLights, frontLights;
+    lightHandler lights;
+    private RayHandler mainLights, backLights, frontLights, charLights;
     private Matrix4 lightRenderPos;
-
     private FrameBuffer fbo;
+    private float charLightInt = 3f;
+    private Texture sky, frontLayer, inBetweenLayer, backLayer;
 
     //for random map generation
     private map mapControl;
@@ -60,6 +57,7 @@ public class play extends gameState{
     //Character physics stuff
     private static contactListener cl;
     private static mainChar myChar;
+    private Vector2 charScreenPos;
 
     public play(stateHandler GSH) {
         super(GSH);
@@ -76,16 +74,17 @@ public class play extends gameState{
         //create character
         myChar = new mainChar(mainChar.createBody(boxWorld));
         mainCam.position.set(new Vector3(myChar.getPosition().x * PPM, myChar.getPosition().y * PPM, mainCam.position.z));
+        charScreenPos = new Vector2(0.5f, 0.5f);
 
         //setup light stuff, has to be done after char creation since a light is attached to the char bod
-        lightHandler lights = new lightHandler();
-        shadowShader = lights.setupShader("shadowShader");
+        lights = new lightHandler();
 
-        quad = lights.creatQuad();
+        sky = frTex.createSky();
 
         frontLights = lights.getRayHandler("frontLights");
         mainLights = lights.getRayHandler("mainLights");
         backLights = lights.getRayHandler("backLights");
+        charLights = lights.getRayHandler("charLights");
 
         fbo = new FrameBuffer(Pixmap.Format.RGBA8888, (cWIDTH * SCALE), (cHEIGHT * SCALE), false);
 
@@ -107,6 +106,7 @@ public class play extends gameState{
         final float yDiff = Math.abs(mainCam.position.y - myChar.getPosition().y * PPM);
 
         //controlled Y movement - creates Mario style camera follow where camera only follows X unless yDiff is big enough
+        //this is nice since the camera following every jump is annoying af
         //this is nice since the camera following every jump is annoying af
         if (yDiff > cHEIGHT / 4f) { movingY = true; }
         if (yDiff < TILESIZE / 4f) { movingY = false; }
@@ -146,6 +146,7 @@ public class play extends gameState{
         frontLights.update();
         mainLights.update();
         backLights.update();
+        charLights.update();
         cameraMovement();
 
         //remove obejcts after world has finished updating
@@ -161,6 +162,9 @@ public class play extends gameState{
 
         mapControl.update(delta);
         myChar.update(delta);
+
+        charScreenPos = new Vector2((myChar.getPosition().x * PPM) / (mainCam.position.x) / 2, (myChar.getPosition().y * PPM) / (mainCam.position.y) / 2);
+        if (myChar.getPosition().x < 1f && myChar.getPosition().x > -1f) charScreenPos.x = 0.5f;
     }
 
     public void render() {
@@ -173,6 +177,7 @@ public class play extends gameState{
         frontLights.setCombinedMatrix(lightRenderPos);
         mainLights.setCombinedMatrix(lightRenderPos);
         backLights.setCombinedMatrix(lightRenderPos);
+        charLights.setCombinedMatrix(lightRenderPos);
 
         batch.setProjectionMatrix(mainCam.combined);
 
@@ -180,25 +185,34 @@ public class play extends gameState{
         mainLights.render();
         frontLights.render();
         backLights.render();
-
-        //for fixing weird blending from shaders
-        batch.setBlendFunction(Gdx.gl20.GL_SRC_ALPHA_SATURATE, Gdx.gl20.GL_ONE);
+        charLights.render();
 
         //draw and blend the lights to the map layers
-        blendLights(backLights.getLightMapTexture(), drawFrameBuffer(mapControl.RENDERBACK));
+        lights.blendLights(sky, backLights.getLightMapTexture(), charLights.getLightMapTexture(), charLightInt / (charLightInt * 1.5f), Color.WHITE, Color.CLEAR);
+        //lights.blendLights(drawFrameBuffer(mapControl.RENDERBACK), backLights.getLightMapTexture(), charLights.getLightMapTexture(), charLightInt);
+
+        backLayer = drawFrameBuffer(mapControl.RENDERBACK);
+        lights.renderGodRays(backLayer, new Vector2(0.5f, 0.5f), true,
+                0.15f, 0.82f, 0.9f, 1.0f);
+        lights.blendLights(backLayer, backLights.getLightMapTexture(), null, 0, Color.WHITE, Color.CLEAR);
 
         //draw the character inbetween layers
-        batch.setBlendFunction(Gdx.gl20.GL_SRC_ALPHA, Gdx.gl20.GL_ONE_MINUS_SRC_ALPHA);
         batch.begin();
         myChar.render(batch, Color.WHITE);
         batch.end();
 
-        batch.setBlendFunction(Gdx.gl20.GL_SRC_ALPHA_SATURATE, Gdx.gl20.GL_ONE);
-        blendLights(mainLights.getLightMapTexture(), drawFrameBuffer(mapControl.RENDERMAIN));
-        blendLights(frontLights.getLightMapTexture(), drawFrameBuffer(mapControl.RENDERFRONT));
+        lights.blendLights(drawFrameBuffer(mapControl.RENDERMAIN), mainLights.getLightMapTexture(), charLights.getLightMapTexture(), charLightInt, Color.WHITE, Color.BROWN);
 
-        //return things to normal
-        batch.setBlendFunction(Gdx.gl20.GL_SRC_ALPHA, Gdx.gl20.GL_ONE_MINUS_SRC_ALPHA);
+        inBetweenLayer = drawFrameBuffer(mapControl.RENDERINBETWEEN);
+        lights.renderGodRays(lights.createOcclude(inBetweenLayer, charLights.getLightMapTexture(), 0), charScreenPos, false,
+                0.06f, 0.8f, 1.0f, 1.0f);
+        lights.blendLights(inBetweenLayer, mainLights.getLightMapTexture(), charLights.getLightMapTexture(), charLightInt / (charLightInt * 2), Color.WHITE, Color.CLEAR);
+
+        frontLayer = drawFrameBuffer(mapControl.RENDERFRONT);
+        lights.renderGodRays(lights.createOcclude(frontLayer, charLights.getLightMapTexture(), 0), charScreenPos, false,
+                0.065f, 0.78f, 1.0f, 1.0f);
+        lights.blendLights(frontLayer, frontLights.getLightMapTexture(), null, 0, Color.WHITE, Color.CLEAR);
+
 
         //For debugging box2D stuff.
         if (DEBUG) {
@@ -209,11 +223,18 @@ public class play extends gameState{
     }
 
     private Texture drawFrameBuffer(int renderLayer) {
+        Gdx.gl20.glBlendEquation(Gdx.gl20.GL_FUNC_ADD);
+
         //draw the map layer to a frame buffer
         fbo.begin();
         {
-            Gdx.gl.glClearColor(0, 0, 0, 0);
+            //clear sprite batch
+            Gdx.gl.glClearColor(0, 0, 0, 0f);
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+            //for fixing weird blending with transparency and shaders
+            //also flips render order use GL_ONE_MINUS_SRC_ALPHA to reverse
+            batch.setBlendFunction(Gdx.gl20.GL_SRC_ALPHA_SATURATE, Gdx.gl20.GL_ONE);
 
             batch.enableBlending();
             batch.begin();
@@ -222,34 +243,10 @@ public class play extends gameState{
         }
         fbo.end();
 
-        return fbo.getColorBufferTexture();
-    }
-
-    private void blendLights(Texture tex0, Texture tex1) {
-        //bind the lightmap texture
-        Gdx.gl20.glActiveTexture(GL20.GL_TEXTURE0);
-        tex0.bind();
-
-        //bind the level texture
-        Gdx.gl20.glActiveTexture(GL20.GL_TEXTURE1);
-        tex1.bind();
-
-        //blend the two textures- happens in the fragment shader
-        Gdx.gl20.glEnable(Gdx.gl20.GL_BLEND);
-        Gdx.gl20.glBlendFunc(Gdx.gl20.GL_SRC_ALPHA, Gdx.gl20.GL_ONE_MINUS_SRC_ALPHA);
-
-        shadowShader.begin();
-        {
-            shadowShader.setUniformf("ambient_color", Color.WHITE);
-            shadowShader.setUniformi("u_texture0", 0);
-            shadowShader.setUniformi("u_texture1", 1);
-            quad.render(shadowShader, GL20.GL_TRIANGLE_FAN, 0, 4);
-        }
-        shadowShader.end();
-
         //return things to normal
-        Gdx.gl20.glDisable(Gdx.gl20.GL_BLEND);
-        Gdx.gl20.glActiveTexture(GL20.GL_TEXTURE0);
+        batch.setBlendFunction(Gdx.gl20.GL_SRC_ALPHA, Gdx.gl20.GL_ONE_MINUS_SRC_ALPHA);
+
+        return fbo.getColorBufferTexture();
     }
 
     //for queuing physics bodies to destroy from other methods.
@@ -273,6 +270,9 @@ public class play extends gameState{
 
         bottomLeftViewPoint.x = camLeftPoint;
         bottomLeftViewPoint.y = mainCam.position.y - mainCam.viewportHeight / 2;
+
+        //System.out.println((myChar.getPosition().x * PPM) / (mainCam.position.x) / 2);
+        //System.out.println((myChar.getPosition().y * PPM) / (mainCam.position.y) / 2);
 
         //remove chunks once they're out of view
         if (mainCam.position.x > rightPointTotal + mainCam.viewportWidth / 2) {

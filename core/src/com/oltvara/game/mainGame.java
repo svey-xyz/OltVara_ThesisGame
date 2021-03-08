@@ -7,7 +7,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.oltvara.game.handlers.*;
-import com.oltvara.game.world.wrldHandlers.forestTextureLoader;
+import com.oltvara.game.handlers.texture.forestTextureLoader;
+import com.oltvara.game.handlers.texture.srcHandler;
 
 public class mainGame extends ApplicationAdapter {
 
@@ -62,6 +63,7 @@ public class mainGame extends ApplicationAdapter {
 		frTex = new forestTextureLoader("Biome1");
 
 		src.importTX("resources/entities/charTest.png", "mainChar");
+		src.importAtlas("resources/entities/mainChar.atlas", "mainCharAtlas");
 
 		batch = new SpriteBatch();
 		mainCam = new OrthographicCamera();

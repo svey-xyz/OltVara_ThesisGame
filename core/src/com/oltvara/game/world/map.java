@@ -13,6 +13,7 @@ import java.util.HashMap;
 public class map {
 
     public final int RENDERMAIN = 0;
+    public final int RENDERINBETWEEN = 2;
     public final int RENDERFRONT = 1;
     public final int RENDERBACK = -1;
 
@@ -83,6 +84,11 @@ public class map {
         for (Body b : chunks.get(offset).getBodies()) {
             play.addBodToDestroy(b);
         }
+
+        for (Body b : chunks.get(offset).getForestBodies()) {
+            play.addBodToDestroy(b);
+        }
+
         chunks.remove(offset);
     }
 
@@ -95,6 +101,10 @@ public class map {
         } else if (renderLayer == RENDERBACK) {
             for(chunk ch : chunks.values()){
                 ch.renderBack(sb);
+            }
+        } else if (renderLayer == RENDERINBETWEEN) {
+            for(chunk ch : chunks.values()){
+                ch.renderBetween(sb);
             }
         } else if (renderLayer == RENDERFRONT) {
             for(chunk ch : chunks.values()){

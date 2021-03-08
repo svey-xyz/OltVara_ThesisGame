@@ -2,7 +2,7 @@ package com.oltvara.game.world;
 
 import static com.oltvara.game.mainGame.*;
 import static com.oltvara.game.mainGame.TILESIZE;
-import static com.oltvara.game.world.wrldHandlers.physicsVars.PPM;
+import static com.oltvara.game.handlers.physicsVars.PPM;
 
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -11,9 +11,10 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.oltvara.game.world.wrldHandlers.treeType;
 
 import java.util.ArrayList;
-
+import static com.oltvara.game.handlers.texture.texTypesNames.*;
 
 public class tree {
 
@@ -24,48 +25,43 @@ public class tree {
     private TextureRegion trunkTex;
     private boolean hasLeaves, hasBackLeaves;
 
-    Texture shadow;
-    Vector2 trOffset;
+    private Texture shadow;
+    private Vector2 trOffset;
 
-    public tree(Vector2 pos, int chunkOffset, int treeType) {
-
+    public tree(treeType trType, Vector2 pos, int chunkOffset) {
         float sDColMod = (float)fct.random() + 1;
 
-        trOffset = frTex.getPosOffset(frTex.TREE, treeType);
-        float lfSDCol = frTex.getLfSDCol(frTex.TREE, treeType) / sDColMod;
-        float trSDCol = frTex.getTrSDCol(treeType) / sDColMod;
-        String txName = frTex.pickTx(frTex.TREE, treeType);
+        trOffset = trType.getTreeOffset();
+        float lfSDCol = trType.getLfSDCol() / sDColMod;
+        float trSDCol = trType.getTrSDCol() / sDColMod;
+
+        String txName = trType.pickTx();
 
         hasLeaves = true;
 
-        if (treeType == frTex.COLOURFULTREE) {
+        if (trType.getTreeTypeName() == COLOURFULTREE) {
             hasBackLeaves = true;
             txName = txName.replace("back_", "front_");
         }
 
         //These trunk textures don't have branches drawn rn
-        if (!txName.equals("medium_1-1-1") && !txName.equals("medium_1-1-2") && !txName.equals("medium_1-1-4")) {
+        if (!txName.equals("medium_1-1-1") && !txName.equals("medium_1-1-2")) {
+            //random chance to not have leaves
             if (fct.random() < 0.05) {
                 hasLeaves = false;
                 hasBackLeaves = false;
             }
         }
 
-        trunkTex = frTex.getTrunk(txName);
+        trunkTex = trType.getTrunk(txName);
 
         leaves = new ArrayList<>();
         backLeaves = new ArrayList<>();
 
         size = trunkTex.getRegionWidth();
 
-        if (size == 128) {
-            shadow = frTex.getTreeShadow("smallShadow");
-        } else {
-            shadow = frTex.getTreeShadow("mediumShadow");
-        }
-
+        shadow = trType.getShadow();
         shadowSize = shadow.getWidth();
-
 
         relPOS = new Vector2();
         relPOS.x = (pos.x + 0.5f + chunkOffset) * TILESIZE / PPM + trOffset.x;
@@ -75,12 +71,14 @@ public class tree {
         renPOS.x = relPOS.x * PPM - size / 2f;
         renPOS.y = relPOS.y * PPM - size / 2f;
 
-        trunkCol = fct.gaussianCol(frTex.getTrunkCol(treeType), trSDCol);
+        trunkCol = fct.gaussianCol(trType.getTrunkCol(), trSDCol);
+
+        Color baseCol = fct.gaussianCol(trType.getLeafCol(), lfSDCol / 2);
 
         //Don't bother creating leaves array if they're not gonna be drawn
         if (hasLeaves) {
-            for (Array<TextureAtlas.AtlasRegion> layer : frTex.getLeaves(frTex.TREE, txName)) {
-                leafCol = fct.gaussianCol(frTex.getLeafCols(frTex.TREE, treeType), lfSDCol);
+            for (Array<TextureAtlas.AtlasRegion> layer : trType.getLeaves(txName)) {
+                leafCol = fct.gaussianCol(baseCol, lfSDCol);
                 int rand = fct.randomInt(12);
                 leaves.add(new leafLayer(relPOS, layer, leafCol, rand));
             }
@@ -88,8 +86,8 @@ public class tree {
 
         if (hasBackLeaves) {
             txName = txName.replace("front_", "back_");
-            for (Array<TextureAtlas.AtlasRegion> layer : frTex.getLeaves(frTex.TREE, txName)) {
-                leafCol = fct.gaussianCol(frTex.getLeafCols(frTex.TREE, treeType), lfSDCol);
+            for (Array<TextureAtlas.AtlasRegion> layer : trType.getLeaves(txName)) {
+                leafCol = fct.gaussianCol(baseCol, lfSDCol);
                 int rand = fct.randomInt(12);
                 backLeaves.add(new leafLayer(relPOS, layer, leafCol, rand));
             }

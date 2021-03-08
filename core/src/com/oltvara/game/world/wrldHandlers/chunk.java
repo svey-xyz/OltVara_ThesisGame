@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.oltvara.game.gamestates.play;
+import com.oltvara.game.handlers.texture.texTypesNames;
 import com.oltvara.game.world.tile;
 
 import java.util.ArrayList;
@@ -14,6 +15,7 @@ import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.oltvara.game.mainGame.*;
+import static com.oltvara.game.handlers.texture.texTypesNames.*;
 
 public class chunk {
 
@@ -30,9 +32,10 @@ public class chunk {
     private HashMap<String, Vector2> neighbours;
     private HashMap<Vector2, Integer> tileSpacing;
 
-   private forest forestHandlerBack, forestHandlerFront;
+    private forest forestHandlerBack, forestHandlerFront;
 
     public chunk(int leftHeight, int rightHeight, int displace, float roughness, int offset) {
+
         this.displace = displace;
         this.roughness = roughness;
 
@@ -107,28 +110,28 @@ public class chunk {
             //Set correct texture based on neighbours
             int yFlip = new Random().nextBoolean() ? -1 : 1;
             if (!tiles.containsKey(neighbours.get("LEFT")) && !tiles.containsKey(neighbours.get("RIGHT")) && isEDGE(tl) == 0) {
-                tl.updateTexture(pickTx(frTex.DOUBLELIVEGROUND), 1, yFlip);
+                tl.updateTexture(pickTx(DOUBLELIVEGROUND), 1, yFlip);
             } else if (!tiles.containsKey(neighbours.get("RIGHT")) && isEDGE(tl) != 1) {
-                tl.updateTexture(pickTx(frTex.LIVEGROUND), 1, yFlip);
+                tl.updateTexture(pickTx(LIVEGROUND), 1, yFlip);
             } else if (!tiles.containsKey(neighbours.get("LEFT")) && isEDGE(tl) != -1) {
-                tl.updateTexture(pickTx(frTex.LIVEGROUND), -1, yFlip);
+                tl.updateTexture(pickTx(LIVEGROUND), -1, yFlip);
             } else {
 
                 int xFlip = 1;
                 yFlip = 1;
 
-                int groundTex;
+                texTypesNames groundTex;
                 float rand = (float)fct.random();
 
                 if (rand > 0.08) {
-                    groundTex = frTex.GROUND;
+                    groundTex = GROUND;
                     xFlip = new Random().nextBoolean() ? -1 : 1;
                     yFlip = new Random().nextBoolean() ? -1 : 1;
                 } else {
                     if (rand < 0.002) {
-                        groundTex = frTex.SPECIALGROUND;
+                        groundTex = SPECIALGROUND;
                     } else {
-                        groundTex = frTex.ROCKS;
+                        groundTex = ROCKS;
                     }
                 }
 
@@ -137,11 +140,12 @@ public class chunk {
 
             //add grass
             if (!tiles.containsKey(neighbours.get("TOP"))) {
-                tl.addGrass(pickTx(frTex.GRASS));
+                tl.addGrass(pickTx(TOPPER));
             }
 
-            //only create physics body if tile is reachable
-            //should help with performance
+            /*only create physics body if tile is reachable
+            should help with performance
+            considering having one body per chunk with a chainshape of top tiles for better performance*/
             if (!hasNeighbours(tl)) {
                 Body bod = play.boxWorld.createBody(tl.createBodDef(OFFSET));
                 bod.createFixture(tl.createFix());
@@ -150,9 +154,10 @@ public class chunk {
                 tileSpacing.put(tl.getPosition(), tileSpace(tl));
             }
         }
+
     }
 
-    private TextureRegion pickTx(Integer texList) {
+    private TextureRegion pickTx(texTypesNames texList) {
         String[] names = frTex.getTileList(texList);
         int txPick = (int)fct.random(0, names.length);
 
@@ -196,7 +201,7 @@ public class chunk {
         but draw calls are still very expensive, so only call draw if actually on screen. */
         bottomLeftViewpoint = play.getBottomLeftViewPoint();
         if (pos.x + size > bottomLeftViewpoint.x && pos.x - size < bottomLeftViewpoint.x + cWIDTH) {
-            if (pos.y + size > bottomLeftViewpoint.y && pos.y - size < bottomLeftViewpoint.y + cHEIGHT) {
+            if (pos.y + size > bottomLeftViewpoint.y /*&& pos.y - size < bottomLeftViewpoint.y + cHEIGHT*/) {
                 return true;
             }
         }
@@ -211,9 +216,9 @@ public class chunk {
     public void renderBack(SpriteBatch sb) {
         forestHandlerBack.renderBack(sb);
     }
+    public void renderBetween(SpriteBatch sb) { forestHandlerFront.renderFrontFoliage(sb); }
 
     public void renderMain(SpriteBatch sb) {
-        forestHandlerFront.renderFrontFoliage(sb);
         for(tile tl : tiles.values()){
             if (inFrame(tl.getRelPOS(), TILESIZE)) {
 
@@ -223,6 +228,9 @@ public class chunk {
                 renderTile(sb, tl.getTX(), tl.getRelPOS(), tl.getFlip());
             }
         }
+
+        forestHandlerFront.renderMain(sb);
+        forestHandlerBack.renderMain(sb);
     }
 
     private void renderTile(SpriteBatch sb, TextureRegion tx, Vector2 pos, Vector2 flip) {
@@ -249,6 +257,12 @@ public class chunk {
 
     public ArrayList<Body> getBodies() {
         return bodies;
+    }
+
+    public ArrayList<Body> getForestBodies() {
+        ArrayList<Body> fBodies = forestHandlerBack.getBodies();
+        fBodies.addAll(forestHandlerFront.getBodies());
+        return fBodies;
     }
 
     public int[] getHeightMap() {

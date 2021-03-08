@@ -107,8 +107,15 @@ public class maths {
         }
     }
 
-    public double lerp(double amount, double cVal, double nVal) {
-        return ((1 - amount) * cVal + amount * nVal);
+    public double lerp(double amount, double cVal, double nVal) { return ((1 - amount) * cVal + amount * nVal); }
+
+    public Color lerpCol(double amount, Color cVal, Color nVal) {
+
+        float red = (float)((1 - amount) * cVal.r + amount * nVal.r);
+        float green = (float)((1 - amount) * cVal.g + amount * nVal.g);
+        float blue = (float)((1 - amount) * cVal.b + amount * nVal.b);
+
+        return new Color(red,green,blue,1);
     }
 
     //for Perlin noise

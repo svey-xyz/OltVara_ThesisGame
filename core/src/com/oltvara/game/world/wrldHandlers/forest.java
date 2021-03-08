@@ -7,16 +7,25 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Body;
+import com.oltvara.game.gamestates.play;
 import com.oltvara.game.mainGame;
 import com.oltvara.game.world.bush;
 import com.oltvara.game.world.rock;
 import com.oltvara.game.world.tree;
+import com.oltvara.game.world.wellObj;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Random;
+
+import static com.oltvara.game.handlers.texture.texTypesNames.*;
 
 public class forest {
 
     private ArrayList<tree> trees;
+    private ArrayList<wellObj> wells;
     private ArrayList<bush> bushes;
     private ArrayList<rock> rocks;
     private HashMap<Vector2, Integer> tileSpaces;
@@ -31,6 +40,8 @@ public class forest {
     private final float MINDISTSMALL = 3f;
     private final float MINDISTMED = 5f;
 
+    private ArrayList<Body> bodies;
+
     forest(int offset,  HashMap<Vector2, Integer> tileSpacing, int[] heightMap) {
         this.offset = offset;
         this.tileSpaces = tileSpacing;
@@ -39,6 +50,9 @@ public class forest {
         trees = new ArrayList<>();
         bushes = new ArrayList<>();
         rocks = new ArrayList<>();
+        wells= new ArrayList<>();
+
+        bodies = new ArrayList<>();
 
         createPlants();
 
@@ -62,8 +76,8 @@ public class forest {
                 if (tileSpaces.get(pos) > 0) {
                     //Rock placement
                     if (rand < 0.2) {
-                        rockNames = frTex.getRockList(frTex.SMALLROCK);
-                        mossNames = frTex.getRockList(frTex.SMALLROCKMOSS);
+                        rockNames = frTex.getRockList(SMALLROCK);
+                        mossNames = frTex.getRockList(SMALLROCKMOSS);
                         txPick = (int)fct.random(0, rockNames.length - 1);
                         moss = null;
 
@@ -77,9 +91,9 @@ public class forest {
                     //places small and medium bushes with probability
                     //rand > 0.1 to allow for spaces with only rocks and no bushes
                     if (rand > 0.1 && rand < 0.4) {
-                        bushes.add(new bush(pos, offset, frTex.SMALLBUSH));
+                        bushes.add(new bush(frTex.getBushType(SMALLBUSH), pos, offset));
                     } else if (rand > 0.4 && rand < 0.5) {
-                        bushes.add(new bush(pos, offset, frTex.MEDIUMBUSH));
+                        bushes.add(new bush(frTex.getBushType(MEDIUMBUSH), pos, offset));
                     }
                 }
 
@@ -88,14 +102,26 @@ public class forest {
                 if (tileSpaces.get(pos) == 3) {
                     if (fct.distance(prevPos, pos) > MINDISTMED) {
                         if (rand < 0.15) {
-                            trees.add(new tree(pos, offset, frTex.MEDIUMBUSHYTREE));
+                            trees.add(new tree(frTex.getTreeType(MEDIUMBUSHYTREE), pos, offset));
                             prevPos = pos;
                         } else if (rand < 0.2) {
-                            trees.add(new tree(pos, offset, frTex.MEDIUMSPIKYTREE));
+                            trees.add(new tree(frTex.getTreeType(MEDIUMSPIKYTREE), pos, offset));
                             prevPos = pos;
                         } else if (rand < 0.21) {
-                            trees.add(new tree(pos, offset, frTex.COLOURFULTREE));
+                            trees.add(new tree(frTex.getTreeType(COLOURFULTREE), pos, offset));
                             prevPos = pos;
+                        } else if (rand < 0.225) {
+                            TextureRegion moss = new Random().nextBoolean() ? frTex.getWellTX("wellMoss") : null;
+                            TextureRegion rocks = new Random().nextBoolean() ? frTex.getWellTX("wellRocks") : null;
+                            TextureRegion rocksMoss = null;
+                            if (rocks != null) rocksMoss = new Random().nextBoolean() ? frTex.getWellTX("wellRocksMoss") : null;
+
+                            wellObj well = new wellObj(pos, offset, frTex.getWellTX("well"), moss, rocks, rocksMoss, fct.gaussianCol(frTex.getMossCol(), frTex.getMossSDCol()), fct.gaussianCol(frTex.getMossCol(), frTex.getMossSDCol()));
+                            wells.add(well);
+
+                            Body bod = play.boxWorld.createBody(well.createBodDef(offset));
+                            bod.createFixture(well.createFix());
+                            bodies.add(bod);
                         }
                     }
                 }
@@ -103,15 +129,15 @@ public class forest {
                 //place objects that fit within two tiles
                 if (tileSpaces.get(pos) >= 2) {
                     if (rand < 0.2) {
-                        bushes.add(new bush(pos, offset, frTex.LARGEBUSH));
+                        bushes.add(new bush(frTex.getBushType(LARGEBUSH), pos, offset));
                     }
 
                     if (fct.distance(prevPos, pos) > MINDISTSMALL) {
                         if (rand < 0.1) {
-                            trees.add(new tree(pos, offset, frTex.SMALLSPIKYTREE));
+                            trees.add(new tree(frTex.getTreeType(SMALLSPIKYTREE), pos, offset));
                             prevPos = pos;
                         } else if (rand < 0.15) {
-                            trees.add(new tree(pos, offset, frTex.SMALLBUSHYTREE));
+                            trees.add(new tree(frTex.getTreeType(SMALLBUSHYTREE), pos, offset));
                             prevPos = pos;
                         }
                     }
@@ -138,8 +164,8 @@ public class forest {
         }
         for (int i = rocks.size() - 1; i >= 0; i--) {
             if (chunk.inFrame(rocks.get(i).getRenPOS(), rocks.get(i).getSize())) {
-                renderRock(sb, rocks.get(i).getTX(), rocks.get(i).getRenPOS(), Color.WHITE);
-                if (rocks.get(i).getMossTX() != null) renderRock(sb, rocks.get(i).getMossTX(), rocks.get(i).getRenPOS(), rocks.get(i).getMossCol());
+                if (rocks.get(i).getMossTX() != null) renderObj(sb, rocks.get(i).getMossTX(), rocks.get(i).getRenPOS(), rocks.get(i).getMossCol());
+                renderObj(sb, rocks.get(i).getTX(), rocks.get(i).getRenPOS(), Color.WHITE);
             }
         }
     }
@@ -147,8 +173,8 @@ public class forest {
     void renderBack(SpriteBatch sb) {
         for (int i = rocks.size() - 1; i >= 0; i--) {
             if (chunk.inFrame(rocks.get(i).getRenPOS(), rocks.get(i).getSize())) {
-                renderRock(sb, rocks.get(i).getTX(), rocks.get(i).getRenPOS(), Color.WHITE);
-                if (rocks.get(i).getMossTX() != null) renderRock(sb, rocks.get(i).getMossTX(), rocks.get(i).getRenPOS(), rocks.get(i).getMossCol());
+                if (rocks.get(i).getMossTX() != null) renderObj(sb, rocks.get(i).getMossTX(), rocks.get(i).getRenPOS(), rocks.get(i).getMossCol());
+                renderObj(sb, rocks.get(i).getTX(), rocks.get(i).getRenPOS(), Color.WHITE);
             }
         }
         for (int i = bushes.size() - 1; i >= 0; i--) {
@@ -163,7 +189,19 @@ public class forest {
         }
     }
 
-    private void renderRock(SpriteBatch sb, TextureRegion tx, Vector2 pos, Color col) {
+    void renderMain(SpriteBatch sb) {
+        for (int i = wells.size() - 1; i >= 0; i--) {
+            if (chunk.inFrame(wells.get(i).getRenPOS(), wells.get(i).getSize())) {
+
+                if (wells.get(i).getMossTX() != null) renderObj(sb, wells.get(i).getMossTX(), wells.get(i).getRenPOS(), wells.get(i).getMossCol());
+                if (wells.get(i).getRockMossTX() != null) renderObj(sb, wells.get(i).getRockMossTX(), wells.get(i).getRenPOS(), wells.get(i).getRockMossCol());
+                if (wells.get(i).getRockTX() != null) renderObj(sb, wells.get(i).getRockTX(), wells.get(i).getRenPOS(), Color.WHITE);
+                renderObj(sb, wells.get(i).getTX(), wells.get(i).getRenPOS(), Color.WHITE);
+            }
+        }
+    }
+
+    private void renderObj(SpriteBatch sb, TextureRegion tx, Vector2 pos, Color col) {
         sb.setColor(col);
         sb.draw(tx, pos.x, pos.y);
     }
@@ -176,5 +214,7 @@ public class forest {
             trees.get(i).update(delta);
         }
     }
+
+    public ArrayList<Body> getBodies() { return bodies; }
 
 }
